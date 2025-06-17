@@ -36,9 +36,3 @@ body {
 * {
   font-family: 'Chomp', sans-serif !important;
 }
-
-@layer base {
-  html {
-    @apply antialiased;
-  }
-}

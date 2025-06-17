@@ -1,32 +1,18 @@
 import { useNavigate } from "react-router";
-import { useState } from "react";
 import studyGroveLogo from "../assets/studygrovelogo.png";
 import { PageTransition } from "../components/PageTransition";
 
 export function Welcome() {
   const navigate = useNavigate();
-  const [isExiting, setIsExiting] = useState(false);
 
   const handleClick = () => {
-    console.log("Click detected, navigating to main...");
-    // Try immediate navigation first
     navigate("/main");
-  };
-
-  const handleClickWithTransition = () => {
-    console.log("Click detected, starting transition...");
-    setIsExiting(true);
-    setTimeout(() => {
-      console.log("Executing navigation...");
-      navigate("/main");
-    }, 500);
   };
 
   return (
     <PageTransition>
       <main 
-        className={`flex items-center justify-center min-h-screen cursor-pointer transition-all duration-500
-          ${isExiting ? 'scale-110 opacity-0' : 'scale-100 opacity-100'}`}
+        className="flex items-center justify-center min-h-screen cursor-pointer"
         onClick={handleClick}
       >
         <div className="flex flex-col items-center gap-4">
