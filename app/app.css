@@ -1,15 +1,44 @@
 @import "tailwindcss";
 
-@theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+/* Debug font loading */
+@font-face {
+  font-family: 'Chomp';
+  src: url('/fonts/Chomp.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block; /* Changed from swap to block to ensure font loads */
 }
 
-html,
-body {
-  @apply bg-white dark:bg-gray-950;
+/* Direct styles outside of layers */
+html {
+  background-color: #F8EBD9;
+  background-image: 
+    linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
 
-  @media (prefers-color-scheme: dark) {
-    color-scheme: dark;
+body {
+  background-color: #F8EBD9;
+  background-image: 
+    linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+/* Force Chomp on all text for testing */
+* {
+  font-family: 'Chomp', sans-serif !important;
+}
+
+@layer base {
+  html {
+    @apply antialiased;
   }
 }
