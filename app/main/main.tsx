@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import studyGroveLogo from "../assets/studygrovelogo.png";
-import mainVideo from "../assets/main.mp4";
 import clock from "../assets/clock2.svg";
+import main from "../assets/main.mp4";
 import { PageTransition } from "../components/PageTransition";
 import { Timer } from "../components/Timer";
 
@@ -9,6 +9,9 @@ export function Main() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isMuted, setIsMuted] = useState(true);
   const [timerOpen, setTimerOpen] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [audioPlaying, setAudioPlaying] = useState(true);
+  const [showAutoplayHint, setShowAutoplayHint] = useState(false);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -20,8 +23,38 @@ export function Main() {
     }
   }, [isMuted]);
 
+  // Try to play audio on mount, show hint if blocked
+  useEffect(() => {
+    if (audioRef.current) {
+      const playPromise = audioRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => setShowAutoplayHint(true));
+      }
+    }
+  }, []);
+
+  // Handler for user interaction to start audio/video
+  const handleUserInteraction = () => {
+    if (audioRef.current) {
+      audioRef.current.play();
+      setAudioPlaying(true);
+    }
+    setShowAutoplayHint(false);
+  };
+
   const toggleMute = () => {
     setIsMuted((prev) => !prev);
+  };
+
+  const toggleAudio = () => {
+    if (!audioRef.current) return;
+    if (audioPlaying) {
+      audioRef.current.pause();
+      setAudioPlaying(false);
+    } else {
+      audioRef.current.play();
+      setAudioPlaying(true);
+    }
   };
 
   const PlayIcon = () => (
@@ -75,17 +108,25 @@ export function Main() {
 
   return (
     <PageTransition>
-      <main className="relative min-h-screen overflow-hidden">
-        {/* Background Video */}
+      <main className="relative min-h-screen overflow-hidden" onClick={showAutoplayHint ? handleUserInteraction : undefined}>
+        {/* Background Video (native video tag) */}
         <video
-          ref={videoRef}
-          className="absolute top-0 left-0 w-full h-full object-cover z-[-1]"
-          src={mainVideo}
+          src={main}
+          autoPlay
           loop
-          controls={false}
           muted
           playsInline
+          className="absolute top-0 left-0 w-full h-full object-cover z-[-1]"
+          style={{ pointerEvents: 'none' }}
+        />
+
+        {/* Background Audio (hidden) */}
+        <audio
+          ref={audioRef}
+          src="https://rr4---sn-vgqsrn6l.googlevideo.com/videoplayback?expire=1750287200&ei=AO9SaPeOJ5eKvdIPz7PQ8AI&ip=86.38.220.233&id=o-ABLbs2wjGAO3Nyh2aDhSHYvjHhSsME7yW1tVjVMqCVlM&itag=140&source=youtube&requiressl=yes&xpc=EgVo2aDSNQ%3D%3D&rms=au%2Cau&siu=1&bui=AY1jyLNOQKQrpngfM3lzY-iX7TZ4W1vVGwoGE-1Goqm4HGjOPeeiRvIw6sforVYMn2387qD4-w&spc=l3OVKWBMIVC7&vprv=1&svpuc=1&xtags=drc%3D1&mime=audio%2Fmp4&ns=1_VBk5ysQJoe178VFsCSiiEQ&rqh=1&gir=yes&clen=178904997&dur=11054.462&lmt=1739215459939479&keepalive=yes&fexp=24350590,24350737,24350827,24350961,24351173,24351316,24351318,24351528,24351759,24351907,24352011,24352022,24352102,24352188,24352236,24352322,51466643,51466698&c=TVHTML5_SIMPLY_EMBEDDED_PLAYER&sefc=1&txp=6308224&n=jNveaHNPvVbLCw&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cxpc%2Csiu%2Cbui%2Cspc%2Cvprv%2Csvpuc%2Cxtags%2Cmime%2Cns%2Crqh%2Cgir%2Cclen%2Cdur%2Clmt&sig=AJfQdSswRQIhAKLn_vCR2N3jDCk5jtKVTk8Fxqc8zK5aStSVzmx9j6nBAiA82a-p9RPKPLg99M3bJl42r260bnH_EFZCH66PFjz9dw%3D%3D&title=enchanted+bookstore+%7C+magical+lofi+music+for+study+%26+reading&redirect_counter=1&rm=sn-4g5e6y7z&rrc=104&req_id=a82ff2e5b6d4a3ee&cms_redirect=yes&ipbypass=yes&met=1750265629,&mh=sT&mip=2601:249:8b01:7030:826:23e4:e0a8:aae6&mm=31&mn=sn-vgqsrn6l&ms=au&mt=1750264666&mv=m&mvi=4&pl=37&lsparams=ipbypass,met,mh,mip,mm,mn,ms,mv,mvi,pl,rms&lsig=APaTxxMwRQIgONho5U_nOGQlGMwUNRp1weVIv1DR5_wjC3yeTjlDY14CIQC5VpugLFJpB3kFEPZttNDBnUagWh4NlE9BC8_9q-R7wg%3D%3D"
           autoPlay
+          loop
+          style={{ display: 'none' }}
         />
 
         {/* Top-Left Buttons Container */}
@@ -102,12 +143,58 @@ export function Main() {
             />
           </button>
 
-          {/* Mute Toggle Button */}
+          {/* Audio Play/Pause Circle Button */}
           <button
-            onClick={toggleMute}
+            onClick={toggleAudio}
             className="w-12 h-12 p-2 rounded-full bg-[#F8EBD9] hover:opacity-80 transition-all duration-300 hover:scale-110 shadow-sm flex items-center justify-center"
+            title={audioPlaying ? "Pause Audio" : "Play Audio"}
           >
-            {isMuted ? <PlayIcon /> : <PauseIcon />}
+            {audioPlaying ? (
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 64 64"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect
+                  x="18"
+                  y="16"
+                  width="8"
+                  height="32"
+                  fill="#db8b44"
+                  stroke="#58290b"
+                  strokeWidth="2"
+                  rx="1"
+                />
+                <rect
+                  x="38"
+                  y="16"
+                  width="8"
+                  height="32"
+                  fill="#db8b44"
+                  stroke="#58290b"
+                  strokeWidth="2"
+                  rx="1"
+                />
+              </svg>
+            ) : (
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 64 64"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <polygon
+                  points="20,16 48,32 20,48"
+                  fill="#db8b44"
+                  stroke="#58290b"
+                  strokeWidth="2"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            )}
           </button>
 
           {/* Timer Button */}
@@ -126,6 +213,7 @@ export function Main() {
         <div className="flex flex-col items-center gap-4 pt-24">
           {/* Add your content here */}
         </div>
+
       </main>
     </PageTransition>
   );
