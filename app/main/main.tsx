@@ -4,11 +4,15 @@ import clock from "../assets/clock2.svg";
 import main from "../assets/main.mp4";
 import { PageTransition } from "../components/PageTransition";
 import { Timer } from "../components/Timer";
+import { ProblemBank } from "../components/ProblemBank";
+import { TodoList } from "../components/TodoList";
 
 export function Main() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isMuted, setIsMuted] = useState(true);
   const [timerOpen, setTimerOpen] = useState(false);
+  const [problemBankOpen, setProblemBankOpen] = useState(false);
+  const [todoListOpen, setTodoListOpen] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [audioPlaying, setAudioPlaying] = useState(true);
   const [showAutoplayHint, setShowAutoplayHint] = useState(false);
@@ -204,10 +208,54 @@ export function Main() {
           >
             <img src={clock} alt="clock" className="w-8 h-8" />
           </button>
+
+          {/* Problem Bank Button */}
+          <button 
+            className="w-12 h-12 p-2 rounded-full bg-[#F8EBD9] hover:opacity-80 transition-all duration-300 hover:scale-110 shadow-sm flex items-center justify-center"
+            onClick={() => setProblemBankOpen(!problemBankOpen)}
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"
+                fill="#db8b44"
+              />
+            </svg>
+          </button>
+
+          {/* Todo List Button */}
+          <button 
+            className="w-12 h-12 p-2 rounded-full bg-[#F8EBD9] hover:opacity-80 transition-all duration-300 hover:scale-110 shadow-sm flex items-center justify-center"
+            onClick={() => setTodoListOpen(!todoListOpen)}
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"
+                fill="#db8b44"
+              />
+            </svg>
+          </button>
         </div>
 
         {/* Timer Widget */}
         <Timer isOpen={timerOpen} onClose={() => setTimerOpen(false)} clockIcon={clock} />
+
+        {/* Problem Bank Widget */}
+        <ProblemBank isOpen={problemBankOpen} onClose={() => setProblemBankOpen(false)} />
+
+        {/* Todo List Widget */}
+        <TodoList isOpen={todoListOpen} onClose={() => setTodoListOpen(false)} />
 
         {/* Main Page Content */}
         <div className="flex flex-col items-center gap-4 pt-24">
