@@ -6,7 +6,7 @@
 
 Your personal space for daily study habits, deep work, and DSA discipline.
 
-**Study Grove** is a dynamic study-assist tool designed for students, self-learners, and developers to build consistent habits, track productivity, and grow their skills — with a little motivational buddy by your side.
+**Study Grove** is a dynamic study-assist tool designed for students, self-learners, and developers to build consistent habits, track productivity, and grow their skills with a little motivational buddy by your side.
 
 ---
 
