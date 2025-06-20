@@ -137,6 +137,28 @@ export function ProblemBank({ isOpen, onClose }: ProblemBankProps) {
     }
   };
 
+  useEffect(() => {
+    const saved = localStorage.getItem('studygrove-problem-bank');
+    if (saved) {
+      const data = JSON.parse(saved);
+      setProblemCount(data.problemCount ?? 0);
+      setDailyGoal(data.dailyGoal ?? 50);
+      setLongTermGoal(data.longTermGoal ?? 1000);
+      setLongTermCount(data.longTermCount ?? 0);
+      setCategories(data.categories ?? { easy: 0, medium: 0, hard: 0 });
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('studygrove-problem-bank', JSON.stringify({
+      problemCount,
+      dailyGoal,
+      longTermGoal,
+      longTermCount,
+      categories
+    }));
+  }, [problemCount, dailyGoal, longTermGoal, longTermCount, categories]);
+
   if (!isOpen) return null;
 
   return (
