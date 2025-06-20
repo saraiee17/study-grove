@@ -11,7 +11,7 @@ export function Timer({ isOpen, onClose, clockIcon }: TimerProps) {
   const [isRunning, setIsRunning] = useState(false);
   const [mode, setMode] = useState<'pomodoro' | 'shortBreak' | 'longBreak'>('pomodoro');
   const [position, setPosition] = useState({ x: 40, y: 100 });
-  const [size, setSize] = useState({ width: 280, height: 320 }); // Increased size for settings
+  const [size, setSize] = useState({ width: 280, height: 420 });
   const [dragging, setDragging] = useState(false);
   const [resizing, setResizing] = useState(false);
   const [resizeDirection, setResizeDirection] = useState<string>('');
@@ -154,18 +154,18 @@ export function Timer({ isOpen, onClose, clockIcon }: TimerProps) {
         const newPosition = { ...position };
         
         if (resizeDirection.includes('e')) {
-          newSize.width = Math.max(280, e.clientX - position.x);
+          newSize.width = Math.max(240, e.clientX - position.x);
         }
         if (resizeDirection.includes('w')) {
-          const newWidth = Math.max(280, position.x + size.width - e.clientX);
+          const newWidth = Math.max(240, position.x + size.width - e.clientX);
           newSize.width = newWidth;
           newPosition.x = e.clientX;
         }
         if (resizeDirection.includes('s')) {
-          newSize.height = Math.max(260, e.clientY - position.y);
+          newSize.height = Math.max(300, e.clientY - position.y);
         }
         if (resizeDirection.includes('n')) {
-          const newHeight = Math.max(260, position.y + size.height - e.clientY);
+          const newHeight = Math.max(300, position.y + size.height - e.clientY);
           newSize.height = newHeight;
           newPosition.y = e.clientY;
         }
@@ -264,87 +264,90 @@ export function Timer({ isOpen, onClose, clockIcon }: TimerProps) {
 
       <div
         ref={timerRef}
-        className="fixed z-50 rounded-xl shadow-lg p-3 select-none cursor-move"
+        className="fixed z-50 rounded-2xl shadow-2xl select-none cursor-move bg-white/30 backdrop-blur-md border border-white/20"
         style={{ 
           left: position.x, 
           top: position.y, 
           width: size.width, 
           height: size.height,
-          background: '#F8EBD9', 
-          border: '2px solid #db8b44',
-          minWidth: '280px',
-          minHeight: '260px'
+          minWidth: '240px',
+          minHeight: '300px',
+          color: '#4A2C2A'
         }}
         onMouseDown={onDragStart}
       >
         {/* Resize handles */}
         <div 
-          className="absolute top-0 left-0 w-8 h-8 cursor-nw-resize z-40"
+          className="absolute top-0 left-0 w-4 h-4 cursor-nwse-resize z-40"
           onMouseDown={(e) => onResizeStart(e, 'nw')}
         />
         <div 
-          className="absolute top-0 right-0 w-8 h-8 cursor-ne-resize z-40"
+          className="absolute top-0 right-0 w-4 h-4 cursor-nesw-resize z-40"
           onMouseDown={(e) => onResizeStart(e, 'ne')}
         />
         <div 
-          className="absolute bottom-0 left-0 w-8 h-8 cursor-sw-resize z-40"
+          className="absolute bottom-0 left-0 w-4 h-4 cursor-nesw-resize z-40"
           onMouseDown={(e) => onResizeStart(e, 'sw')}
         />
         <div 
-          className="absolute bottom-0 right-0 w-8 h-8 cursor-se-resize z-40"
+          className="absolute bottom-0 right-0 w-4 h-4 cursor-nwse-resize z-40"
           onMouseDown={(e) => onResizeStart(e, 'se')}
         />
 
         {/* Content */}
-        <div className="relative z-10 h-full flex flex-col">
+        <div className="relative z-10 h-full flex flex-col p-5">
           {/* Header with close and settings */}
-          <div className="flex justify-between items-center mb-3">
+          <div className="flex justify-between items-center mb-4">
             <button
               onClick={e => { e.stopPropagation(); setShowSettings(!showSettings); }}
-              className="w-8 h-8 flex items-center justify-center text-[#4A2C2A] hover:text-[#db8b44] text-lg font-bold bg-[#F8EBD9] rounded-full hover:bg-[#db8b44] hover:text-white transition-colors z-20 border border-[#db8b44] border-opacity-30"
+              className="w-8 h-8 flex items-center justify-center text-xl text-[#4A2C2A]/70 hover:text-[#db8b44] hover:bg-black/10 rounded-full transition-colors z-20"
               style={{ pointerEvents: 'auto' }}
               title="Settings"
-            >⚙</button>
+            >⚙️</button>
             
-            <div className="flex items-center gap-2">
-              <img src={clockIcon} alt="clock" className="w-8 h-8" />
-              <span className="text-lg font-bold text-[#4A2C2A]">Pomodoro Timer</span>
-            </div>
+            {size.width >= 270 && (
+              <div className="flex items-center gap-2">
+                <img src={clockIcon} alt="clock" className="w-6 h-6" />
+                <span className="text-lg font-semibold">Pomodoro Timer</span>
+              </div>
+            )}
             
             <button
               onClick={e => { e.stopPropagation(); onClose(); }}
-              className="w-8 h-8 flex items-center justify-center text-[#4A2C2A] hover:text-[#db8b44] text-lg font-bold bg-[#F8EBD9] rounded-full hover:bg-[#db8b44] hover:text-white transition-colors z-20"
+              className="w-8 h-8 flex items-center justify-center text-2xl text-[#4A2C2A]/70 hover:text-[#db8b44] hover:bg-black/10 rounded-full transition-colors z-20"
               style={{ pointerEvents: 'auto' }}
-            >×</button>
+            >×
+            </button>
           </div>
           
           {/* Session Progress */}
-          <div className="text-center mb-4 p-3 bg-white/50 rounded-lg border border-[#db8b44] border-opacity-30">
-            <div className="text-sm font-bold text-[#4A2C2A] mb-1">
-              Session {sessionCount + 1} • {completedPomodoros}/{targetSessions} completed
+          {size.height >= 380 && (
+            <div className="text-center mb-4 p-3 bg-black/5 rounded-lg">
+              <div className="text-sm font-medium text-[#4A2C2A] mb-2">
+                <span>Session {sessionCount + 1}</span>
+                <span className="mx-2">•</span>
+                <span>{completedPomodoros}/{targetSessions} done</span>
+              </div>
+              <div className="w-full bg-black/10 rounded-full h-2.5">
+                <div 
+                  className="bg-[#db8b44] h-2.5 rounded-full transition-all duration-500 ease-out"
+                  style={{ width: `${(completedPomodoros / targetSessions) * 100}%` }}
+                ></div>
+              </div>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div 
-                className="bg-[#db8b44] h-2 rounded-full transition-all duration-300"
-                style={{ width: `${(completedPomodoros / targetSessions) * 100}%` }}
-              ></div>
-            </div>
-          </div>
+          )}
           
-          {/* Settings Panel */}
-          {showSettings && (
-            <div className="mb-4 p-4 rounded-lg bg-white/80 border border-[#db8b44] border-opacity-30">
-              <div className="text-sm font-bold text-[#4A2C2A] mb-3 text-center">Timer Settings</div>
-              <div className="grid grid-cols-2 gap-3">
+          {showSettings ? (
+            <div className="mb-4 p-4 rounded-lg bg-black/5 flex-1">
+              <div className="text-md font-semibold text-[#4A2C2A] mb-3 text-center">Timer Settings</div>
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <div className="text-xs font-bold mb-1" style={{ color: '#4A2C2A' }}>
-                    Work (min)
-                  </div>
+                  <label className="text-xs font-bold mb-1 block">Work (min)</label>
                   <input
                     type="number"
                     value={customTimeSettings.pomodoro}
                     onChange={(e) => handleTimeSettingChange('pomodoro', e.target.value)}
-                    className="w-full px-2 py-1 text-sm rounded border-2 border-[#db8b44] bg-white focus:outline-none focus:border-[#4A2C2A]"
+                    className="w-full px-2 py-1.5 text-sm rounded-md border-none bg-white/50 focus:outline-none focus:ring-2 focus:ring-[#db8b44]"
                     min="1"
                     max="999"
                     onClick={(e) => e.stopPropagation()}
@@ -353,14 +356,12 @@ export function Timer({ isOpen, onClose, clockIcon }: TimerProps) {
                 </div>
                 
                 <div>
-                  <div className="text-xs font-bold mb-1" style={{ color: '#4A2C2A' }}>
-                    Short Break (min)
-                  </div>
+                  <label className="text-xs font-bold mb-1 block">Short Break (min)</label>
                   <input
                     type="number"
                     value={customTimeSettings.shortBreak}
                     onChange={(e) => handleTimeSettingChange('shortBreak', e.target.value)}
-                    className="w-full px-2 py-1 text-sm rounded border-2 border-[#db8b44] bg-white focus:outline-none focus:border-[#4A2C2A]"
+                    className="w-full px-2 py-1.5 text-sm rounded-md border-none bg-white/50 focus:outline-none focus:ring-2 focus:ring-[#db8b44]"
                     min="0"
                     max="999"
                     onClick={(e) => e.stopPropagation()}
@@ -369,14 +370,12 @@ export function Timer({ isOpen, onClose, clockIcon }: TimerProps) {
                 </div>
                 
                 <div>
-                  <div className="text-xs font-bold mb-1" style={{ color: '#4A2C2A' }}>
-                    Long Break (min)
-                  </div>
+                  <label className="text-xs font-bold mb-1 block">Long Break (min)</label>
                   <input
                     type="number"
                     value={customTimeSettings.longBreak}
                     onChange={(e) => handleTimeSettingChange('longBreak', e.target.value)}
-                    className="w-full px-2 py-1 text-sm rounded border-2 border-[#db8b44] bg-white focus:outline-none focus:border-[#4A2C2A]"
+                    className="w-full px-2 py-1.5 text-sm rounded-md border-none bg-white/50 focus:outline-none focus:ring-2 focus:ring-[#db8b44]"
                     min="0"
                     max="999"
                     onClick={(e) => e.stopPropagation()}
@@ -385,14 +384,12 @@ export function Timer({ isOpen, onClose, clockIcon }: TimerProps) {
                 </div>
                 
                 <div>
-                  <div className="text-xs font-bold mb-1" style={{ color: '#4A2C2A' }}>
-                    Sessions
-                  </div>
+                  <label className="text-xs font-bold mb-1 block">Sessions</label>
                   <input
                     type="number"
                     value={targetSessions}
                     onChange={(e) => handleTargetSessionsChange(e.target.value)}
-                    className="w-full px-2 py-1 text-sm rounded border-2 border-[#db8b44] bg-white focus:outline-none focus:border-[#4A2C2A]"
+                    className="w-full px-2 py-1.5 text-sm rounded-md border-none bg-white/50 focus:outline-none focus:ring-2 focus:ring-[#db8b44]"
                     min="1"
                     max="99"
                     onClick={(e) => e.stopPropagation()}
@@ -401,83 +398,90 @@ export function Timer({ isOpen, onClose, clockIcon }: TimerProps) {
                 </div>
               </div>
               
-              <div className="mt-3 flex justify-center">
+              <div className="mt-4 flex justify-center">
                 <button
                   onClick={e => { e.stopPropagation(); setAutoProgress(!autoProgress); }}
-                  className={`px-4 py-2 rounded text-sm font-bold transition-colors ${autoProgress ? 'bg-[#db8b44] text-white' : 'bg-[#4A2C2A] text-[#F8EBD9] hover:bg-[#db8b44] hover:text-white'}`}
+                  className={`px-4 py-2 rounded-md text-sm font-bold transition-all duration-300 w-full ${autoProgress ? 'bg-[#db8b44] text-white shadow-md' : 'bg-black/10 text-[#4A2C2A]/80 hover:bg-black/20'}`}
                   style={{ pointerEvents: 'auto' }}
                   title="Auto-progress to next session"
                 >
-                  {autoProgress ? '✓ Auto Progress' : '✗ Manual Progress'}
+                  {autoProgress ? 'Auto Progress: ON' : 'Auto Progress: OFF'}
                 </button>
               </div>
             </div>
+          ) : (
+            <>
+              {/* Mode Selection */}
+              <div className="flex justify-center mb-6">
+                <div className="flex bg-black/10 rounded-full p-1">
+                  <button
+                    onClick={e => { e.stopPropagation(); switchMode('pomodoro'); }}
+                    className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${mode === 'pomodoro' ? 'bg-white/80 text-[#db8b44] shadow-sm' : 'text-[#4A2C2A]/70 hover:bg-white/30'}`}
+                    style={{ pointerEvents: 'auto' }}
+                  >Focus</button>
+                  <button
+                    onClick={e => { e.stopPropagation(); switchMode('shortBreak'); }}
+                    className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${mode === 'shortBreak' ? 'bg-white/80 text-[#db8b44] shadow-sm' : 'text-[#4A2C2A]/70 hover:bg-white/30'}`}
+                    style={{ pointerEvents: 'auto' }}
+                  >Short</button>
+                  <button
+                    onClick={e => { e.stopPropagation(); switchMode('longBreak'); }}
+                    className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${mode === 'longBreak' ? 'bg-white/80 text-[#db8b44] shadow-sm' : 'text-[#4A2C2A]/70 hover:bg-white/30'}`}
+                    style={{ pointerEvents: 'auto' }}
+                  >Long</button>
+                </div>
+              </div>
+              
+              {/* Timer Display */}
+              <div className="text-center mb-6 flex-1 flex flex-col justify-center items-center">
+                <div className="text-7xl font-sans font-bold mb-1" style={{ color: '#4A2C2A' }}>
+                  {formatTime(timeLeft)}
+                </div>
+                {size.height >= 340 && (
+                  <div className="text-lg font-medium tracking-wider" style={{ color: '#db8b44' }}>
+                    {mode === 'pomodoro' && 'FOCUS'}
+                    {mode === 'shortBreak' && 'SHORT BREAK'}
+                    {mode === 'longBreak' && 'LONG BREAK'}
+                  </div>
+                )}
+              </div>
+              
+              {/* Control Buttons */}
+              <div className="flex gap-4 justify-center items-center mb-4">
+                <button
+                  onClick={e => { e.stopPropagation(); resetTimer(); }}
+                  className="w-12 h-12 flex items-center justify-center rounded-full font-bold text-lg bg-black/10 text-[#4A2C2A]/80 hover:bg-black/20 transition-colors shadow-sm"
+                  style={{ pointerEvents: 'auto' }}
+                  title="Reset Timer"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                </button>
+                
+                {!isRunning ? (
+                  <button
+                    onClick={e => { e.stopPropagation(); startTimer(); }}
+                    className="w-24 h-24 flex items-center justify-center rounded-full font-bold text-2xl bg-[#db8b44] text-white hover:bg-[#c57a3d] transition-all duration-300 shadow-lg transform hover:scale-105"
+                    style={{ pointerEvents: 'auto' }}
+                  >START</button>
+                ) : (
+                  <button
+                    onClick={e => { e.stopPropagation(); pauseTimer(); }}
+                    className="w-24 h-24 flex items-center justify-center rounded-full font-bold text-2xl bg-[#db8b44] text-white hover:bg-[#c57a3d] transition-all duration-300 shadow-lg transform hover:scale-105"
+                    style={{ pointerEvents: 'auto' }}
+                  >PAUSE</button>
+                )}
+    
+                <button
+                  onClick={e => { e.stopPropagation(); resetSessions(); }}
+                  className="w-12 h-12 flex items-center justify-center rounded-full font-bold text-lg bg-black/10 text-[#4A2C2A]/80 hover:bg-black/20 transition-colors shadow-sm"
+                  style={{ pointerEvents: 'auto' }}
+                  title="Reset all sessions"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 2v6h6"/><path d="M21 12A9 9 0 0 0 6 5.3L3 8"/><path d="M21 22v-6h-6"/><path d="M3 12a9 9 0 0 0 15 6.7l3-2.7"/></svg>
+                </button>
+              </div>
+            </>
           )}
-          
-          {/* Mode Selection */}
-          <div className="flex justify-center mb-4">
-            <div className="flex bg-[#4A2C2A] rounded-lg p-1">
-              <button
-                onClick={e => { e.stopPropagation(); switchMode('pomodoro'); }}
-                className={`px-4 py-2 rounded text-sm font-bold transition-colors ${mode === 'pomodoro' ? 'bg-[#db8b44] text-white' : 'text-[#F8EBD9] hover:text-[#db8b44]'}`}
-                style={{ pointerEvents: 'auto' }}
-              >Focus</button>
-              <button
-                onClick={e => { e.stopPropagation(); switchMode('shortBreak'); }}
-                className={`px-4 py-2 rounded text-sm font-bold transition-colors ${mode === 'shortBreak' ? 'bg-[#db8b44] text-white' : 'text-[#F8EBD9] hover:text-[#db8b44]'}`}
-                style={{ pointerEvents: 'auto' }}
-              >Short</button>
-              <button
-                onClick={e => { e.stopPropagation(); switchMode('longBreak'); }}
-                className={`px-4 py-2 rounded text-sm font-bold transition-colors ${mode === 'longBreak' ? 'bg-[#db8b44] text-white' : 'text-[#F8EBD9] hover:text-[#db8b44]'}`}
-                style={{ pointerEvents: 'auto' }}
-              >Long</button>
-            </div>
-          </div>
-          
-          {/* Timer Display */}
-          <div className="text-center mb-6 flex-1 flex flex-col justify-center">
-            <div className="text-5xl font-mono font-bold mb-2" style={{ color: '#4A2C2A' }}>
-              {formatTime(timeLeft)}
-            </div>
-            <div className="text-lg font-semibold" style={{ color: '#db8b44' }}>
-              {mode === 'pomodoro' && 'Focus Time'}
-              {mode === 'shortBreak' && 'Short Break'}
-              {mode === 'longBreak' && 'Long Break'}
-            </div>
-          </div>
-          
-          {/* Control Buttons */}
-          <div className="flex gap-3 justify-center mb-4">
-            {!isRunning ? (
-              <button
-                onClick={e => { e.stopPropagation(); startTimer(); }}
-                className="px-6 py-3 rounded-lg font-bold text-base bg-[#db8b44] text-white hover:bg-[#4A2C2A] hover:text-[#F8EBD9] transition-colors shadow-md"
-                style={{ pointerEvents: 'auto' }}
-              >Start</button>
-            ) : (
-              <button
-                onClick={e => { e.stopPropagation(); pauseTimer(); }}
-                className="px-6 py-3 rounded-lg font-bold text-base bg-[#db8b44] text-white hover:bg-[#4A2C2A] hover:text-[#F8EBD9] transition-colors shadow-md"
-                style={{ pointerEvents: 'auto' }}
-              >Pause</button>
-            )}
-            <button
-              onClick={e => { e.stopPropagation(); resetTimer(); }}
-              className="px-6 py-3 rounded-lg font-bold text-base bg-[#4A2C2A] text-[#F8EBD9] hover:bg-[#db8b44] hover:text-white transition-colors shadow-md"
-              style={{ pointerEvents: 'auto' }}
-            >Reset</button>
-          </div>
-          
-          {/* Reset All Button */}
-          <div className="flex justify-center">
-            <button
-              onClick={e => { e.stopPropagation(); resetSessions(); }}
-              className="px-4 py-2 rounded-lg font-bold text-sm bg-gray-500 text-white hover:bg-gray-600 transition-colors"
-              style={{ pointerEvents: 'auto' }}
-              title="Reset all sessions"
-            >Reset All Sessions</button>
-          </div>
         </div>
       </div>
     </>

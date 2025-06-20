@@ -70,18 +70,18 @@ export function TodoList({ isOpen, onClose }: TodoListProps) {
         const newPosition = { ...position };
         
         if (resizeDirection.includes('e')) {
-          newSize.width = Math.max(280, e.clientX - position.x);
+          newSize.width = Math.max(220, e.clientX - position.x);
         }
         if (resizeDirection.includes('w')) {
-          const newWidth = Math.max(280, position.x + size.width - e.clientX);
+          const newWidth = Math.max(220, position.x + size.width - e.clientX);
           newSize.width = newWidth;
           newPosition.x = e.clientX;
         }
         if (resizeDirection.includes('s')) {
-          newSize.height = Math.max(400, e.clientY - position.y);
+          newSize.height = Math.max(340, e.clientY - position.y);
         }
         if (resizeDirection.includes('n')) {
-          const newHeight = Math.max(400, position.y + size.height - e.clientY);
+          const newHeight = Math.max(340, position.y + size.height - e.clientY);
           newSize.height = newHeight;
           newPosition.y = e.clientY;
         }
@@ -172,45 +172,44 @@ export function TodoList({ isOpen, onClose }: TodoListProps) {
   return (
     <div
       ref={todoListRef}
-      className="fixed z-50 rounded-xl shadow-lg select-none cursor-move"
+      className="fixed z-50 rounded-2xl shadow-2xl select-none cursor-move bg-white/30 backdrop-blur-md border border-white/20"
       style={{ 
         left: position.x, 
         top: position.y, 
         width: size.width, 
         height: size.height,
-        background: '#F8EBD9', 
-        border: '2px solid #db8b44',
-        minWidth: '280px',
-        minHeight: '400px'
+        minWidth: '220px',
+        minHeight: '340px',
+        color: '#4A2C2A'
       }}
       onMouseDown={onDragStart}
     >
       {/* Resize handles */}
       <div 
-        className="absolute top-0 left-0 w-8 h-8 cursor-nw-resize z-40"
+        className="absolute top-0 left-0 w-4 h-4 cursor-nwse-resize z-40"
         onMouseDown={(e) => onResizeStart(e, 'nw')}
       />
       <div 
-        className="absolute top-0 right-0 w-8 h-8 cursor-ne-resize z-40"
+        className="absolute top-0 right-0 w-4 h-4 cursor-nesw-resize z-40"
         onMouseDown={(e) => onResizeStart(e, 'ne')}
       />
       <div 
-        className="absolute bottom-0 left-0 w-8 h-8 cursor-sw-resize z-40"
+        className="absolute bottom-0 left-0 w-4 h-4 cursor-nesw-resize z-40"
         onMouseDown={(e) => onResizeStart(e, 'sw')}
       />
       <div 
-        className="absolute bottom-0 right-0 w-8 h-8 cursor-se-resize z-40"
+        className="absolute bottom-0 right-0 w-4 h-4 cursor-nwse-resize z-40"
         onMouseDown={(e) => onResizeStart(e, 'se')}
       />
 
       {/* Content Container */}
-      <div className="p-4 h-full flex flex-col">
+      <div className="p-5 h-full flex flex-col">
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
-          <div className="text-xl font-bold text-[#4A2C2A]">To-Do List</div>
+          <span className="text-xl font-semibold">To-Do List</span>
           <button
             onClick={(e) => { e.stopPropagation(); onClose(); }}
-            className="text-[#4A2C2A] hover:text-[#db8b44] text-xl font-bold"
+            className="w-8 h-8 flex items-center justify-center text-2xl text-[#4A2C2A]/70 hover:text-[#db8b44] hover:bg-black/10 rounded-full transition-colors z-20"
             style={{ pointerEvents: 'auto' }}
           >
             ×
@@ -218,43 +217,41 @@ export function TodoList({ isOpen, onClose }: TodoListProps) {
         </div>
 
         {/* Progress indicator */}
-        <div className="mb-4 p-3 bg-white/50 rounded-lg border border-[#db8b44] border-opacity-30">
-          <div className="text-sm font-bold text-[#4A2C2A] mb-2 text-center">
+        <div className="mb-4">
+          <div className="text-sm font-medium text-[#4A2C2A] mb-2 text-center">
             {completedCount} of {totalCount} completed
           </div>
-          {totalCount > 0 && (
-            <div className="w-full bg-gray-200 rounded-full h-3">
-              <div 
-                className="bg-[#db8b44] h-3 rounded-full transition-all duration-300"
-                style={{ width: `${(completedCount / totalCount) * 100}%` }}
-              ></div>
-            </div>
-          )}
+          <div className="w-full bg-black/10 rounded-full h-2.5">
+            <div 
+              className="bg-[#db8b44] h-2.5 rounded-full transition-all duration-500 ease-out"
+              style={{ width: `${totalCount > 0 ? (completedCount / totalCount) * 100 : 0}%` }}
+            ></div>
+          </div>
         </div>
 
         {/* Filter buttons */}
         <div className="flex justify-center mb-4">
-          <div className="flex bg-[#4A2C2A] rounded-lg p-1">
-            <button
+          <div className="flex bg-black/10 rounded-full p-1">
+             <button
               onClick={(e) => { e.stopPropagation(); setFilter('all'); }}
-              className={`px-4 py-2 rounded text-sm font-bold transition-colors ${filter === 'all' ? 'bg-[#db8b44] text-white' : 'text-[#F8EBD9] hover:text-[#db8b44]'}`}
+              className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-300 ${filter === 'all' ? 'bg-white/80 text-[#db8b44] shadow-sm' : 'text-[#4A2C2A]/70 hover:bg-white/30'}`}
               style={{ pointerEvents: 'auto' }}
             >
-              All ({totalCount})
+              All
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); setFilter('active'); }}
-              className={`px-4 py-2 rounded text-sm font-bold transition-colors ${filter === 'active' ? 'bg-[#db8b44] text-white' : 'text-[#F8EBD9] hover:text-[#db8b44]'}`}
+              className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-300 ${filter === 'active' ? 'bg-white/80 text-[#db8b44] shadow-sm' : 'text-[#4A2C2A]/70 hover:bg-white/30'}`}
               style={{ pointerEvents: 'auto' }}
             >
-              Active ({totalCount - completedCount})
+              Active
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); setFilter('completed'); }}
-              className={`px-4 py-2 rounded text-sm font-bold transition-colors ${filter === 'completed' ? 'bg-[#db8b44] text-white' : 'text-[#F8EBD9] hover:text-[#db8b44]'}`}
+              className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-300 ${filter === 'completed' ? 'bg-white/80 text-[#db8b44] shadow-sm' : 'text-[#4A2C2A]/70 hover:bg-white/30'}`}
               style={{ pointerEvents: 'auto' }}
             >
-              Done ({completedCount})
+              Done
             </button>
           </div>
         </div>
@@ -267,14 +264,14 @@ export function TodoList({ isOpen, onClose }: TodoListProps) {
             onChange={(e) => setNewTodoText(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && addTodo()}
             placeholder="Add a new task..."
-            className="flex-1 px-3 py-2 border-2 border-[#db8b44] rounded-lg focus:outline-none focus:border-[#4A2C2A] bg-white"
+            className="flex-1 px-4 py-2 border-none rounded-lg focus:outline-none focus:ring-2 focus:ring-[#db8b44] bg-black/5 text-[#4A2C2A] placeholder:text-[#4A2C2A]/50"
             style={{ pointerEvents: 'auto' }}
             onClick={(e) => e.stopPropagation()}
             onMouseDown={(e) => e.stopPropagation()}
           />
           <button
             onClick={(e) => { e.stopPropagation(); addTodo(); }}
-            className="px-4 py-2 bg-[#db8b44] text-white rounded-lg hover:bg-[#4A2C2A] transition-colors font-bold"
+            className="px-5 py-2 bg-[#db8b44] text-white rounded-lg hover:bg-[#c57a3d] transition-colors font-bold shadow-md"
             style={{ pointerEvents: 'auto' }}
           >
             Add
@@ -282,73 +279,78 @@ export function TodoList({ isOpen, onClose }: TodoListProps) {
         </div>
 
         {/* Todo list */}
-        <div className="flex-1 overflow-y-auto mb-4">
+        <div className="flex-1 overflow-y-auto -mr-2 pr-2 mb-4 space-y-2">
           {filteredTodos.length === 0 ? (
-            <div className="text-center text-[#4A2C2A] opacity-75 py-8">
-              {filter === 'all' ? 'No tasks yet' : 
-               filter === 'active' ? 'No active tasks' : 'No completed tasks'}
+            <div className="text-center text-[#4A2C2A] opacity-60 pt-10">
+              <p className="text-lg">✨</p>
+              <p className="font-medium mt-2">
+                {filter === 'all' ? 'Your list is clear!' : 
+                 filter === 'active' ? 'No active tasks' : 'No completed tasks'}
+              </p>
             </div>
           ) : (
-            <div className="space-y-3">
+            <>
               {filteredTodos.map(todo => (
                 <div
                   key={todo.id}
-                  className={`flex items-center gap-3 p-4 rounded-lg border-2 transition-all ${
+                  className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-300 cursor-pointer ${
                     todo.completed 
-                      ? 'bg-gray-100 border-gray-300' 
-                      : 'bg-white border-[#db8b44]'
+                      ? 'bg-black/5 text-[#4A2C2A]/50' 
+                      : 'bg-white/40 hover:bg-white/60'
                   }`}
+                  onClick={() => toggleTodo(todo.id)}
                 >
-                  <input
-                    type="checkbox"
-                    checked={todo.completed}
-                    onChange={() => toggleTodo(todo.id)}
-                    className="w-5 h-5 text-[#db8b44] rounded focus:ring-[#db8b44]"
-                    style={{ pointerEvents: 'auto' }}
-                    onClick={(e) => e.stopPropagation()}
-                  />
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={todo.completed}
+                      onChange={() => {}} // The parent div handles the click
+                      className="w-5 h-5 text-[#db8b44] bg-transparent border-2 border-[#4A2C2A]/30 rounded focus:ring-offset-0 focus:ring-2 focus:ring-[#db8b44] transition"
+                      style={{ pointerEvents: 'auto' }}
+                      onClick={(e) => e.stopPropagation()} // Prevent double-toggle
+                      onMouseDown={(e) => e.stopPropagation()}
+                    />
+                  </div>
                   <span
                     className={`flex-1 text-sm font-medium ${
-                      todo.completed 
-                        ? 'line-through text-gray-500' 
-                        : 'text-[#4A2C2A]'
+                      todo.completed && 'line-through'
                     }`}
                   >
                     {todo.text}
                   </span>
                   
                   {/* Priority indicators */}
-                  <div className="flex gap-1">
+                  <div className="flex gap-1.5" onClick={e => e.stopPropagation()}>
                     <button
-                      onClick={(e) => { e.stopPropagation(); setPriority(todo.id, 'low'); }}
-                      className={`w-4 h-4 rounded-full transition-colors border-2 ${
-                        todo.priority === 'low' ? 'bg-green-500 border-green-600' : 'bg-gray-200 border-gray-300 hover:bg-green-200'
+                      onClick={() => setPriority(todo.id, 'high')}
+                      className={`w-4 h-4 rounded-full transition-transform hover:scale-125 border-2 ${
+                        todo.priority === 'high' ? 'bg-red-500 border-red-700' : 'bg-transparent border-red-500/50'
                       }`}
                       style={{ pointerEvents: 'auto' }}
-                      title="Low priority"
+                      title="High priority"
                     />
                     <button
-                      onClick={(e) => { e.stopPropagation(); setPriority(todo.id, 'medium'); }}
-                      className={`w-4 h-4 rounded-full transition-colors border-2 ${
-                        todo.priority === 'medium' ? 'bg-yellow-500 border-yellow-600' : 'bg-gray-200 border-gray-300 hover:bg-yellow-200'
+                      onClick={() => setPriority(todo.id, 'medium')}
+                      className={`w-4 h-4 rounded-full transition-transform hover:scale-125 border-2 ${
+                        todo.priority === 'medium' ? 'bg-yellow-500 border-yellow-700' : 'bg-transparent border-yellow-500/50'
                       }`}
                       style={{ pointerEvents: 'auto' }}
                       title="Medium priority"
                     />
-                    <button
-                      onClick={(e) => { e.stopPropagation(); setPriority(todo.id, 'high'); }}
-                      className={`w-4 h-4 rounded-full transition-colors border-2 ${
-                        todo.priority === 'high' ? 'bg-red-500 border-red-600' : 'bg-gray-200 border-gray-300 hover:bg-red-200'
+                     <button
+                      onClick={() => setPriority(todo.id, 'low')}
+                      className={`w-4 h-4 rounded-full transition-transform hover:scale-125 border-2 ${
+                        todo.priority === 'low' ? 'bg-green-500 border-green-700' : 'bg-transparent border-green-500/50'
                       }`}
                       style={{ pointerEvents: 'auto' }}
-                      title="High priority"
+                      title="Low priority"
                     />
                   </div>
                   
                   {/* Delete button */}
                   <button
                     onClick={(e) => { e.stopPropagation(); deleteTodo(todo.id); }}
-                    className="w-6 h-6 flex items-center justify-center text-red-500 hover:text-red-700 hover:bg-red-100 rounded transition-colors"
+                    className="w-7 h-7 flex items-center justify-center text-lg text-[#4A2C2A]/40 hover:text-red-500 hover:bg-red-500/10 rounded-full transition-colors"
                     style={{ pointerEvents: 'auto' }}
                     title="Delete task"
                   >
@@ -356,7 +358,7 @@ export function TodoList({ isOpen, onClose }: TodoListProps) {
                   </button>
                 </div>
               ))}
-            </div>
+            </>
           )}
         </div>
 
@@ -365,7 +367,7 @@ export function TodoList({ isOpen, onClose }: TodoListProps) {
           <div className="flex justify-center">
             <button
               onClick={(e) => { e.stopPropagation(); clearCompleted(); }}
-              className="px-4 py-2 bg-[#4A2C2A] text-white rounded-lg hover:bg-[#db8b44] transition-colors text-sm font-bold"
+              className="px-5 py-2 bg-black/10 text-[#4A2C2A]/80 rounded-lg hover:bg-black/20 hover:text-[#4A2C2A] transition-colors text-sm font-bold"
               style={{ pointerEvents: 'auto' }}
             >
               Clear Completed ({completedCount})
@@ -375,4 +377,4 @@ export function TodoList({ isOpen, onClose }: TodoListProps) {
       </div>
     </div>
   );
-} 
+}

@@ -51,18 +51,18 @@ export function ProblemBank({ isOpen, onClose }: ProblemBankProps) {
         const newPosition = { ...position };
         
         if (resizeDirection.includes('e')) {
-          newSize.width = Math.max(240, e.clientX - position.x);
+          newSize.width = Math.max(220, e.clientX - position.x);
         }
         if (resizeDirection.includes('w')) {
-          const newWidth = Math.max(240, position.x + size.width - e.clientX);
+          const newWidth = Math.max(220, position.x + size.width - e.clientX);
           newSize.width = newWidth;
           newPosition.x = e.clientX;
         }
         if (resizeDirection.includes('s')) {
-          newSize.height = Math.max(320, e.clientY - position.y);
+          newSize.height = Math.max(360, e.clientY - position.y);
         }
         if (resizeDirection.includes('n')) {
-          const newHeight = Math.max(320, position.y + size.height - e.clientY);
+          const newHeight = Math.max(360, position.y + size.height - e.clientY);
           newSize.height = newHeight;
           newPosition.y = e.clientY;
         }
@@ -164,55 +164,52 @@ export function ProblemBank({ isOpen, onClose }: ProblemBankProps) {
   return (
     <div
       ref={problemBankRef}
-      className="fixed z-50 rounded-xl shadow-lg select-none cursor-move"
+      className="fixed z-50 rounded-2xl shadow-2xl select-none cursor-move bg-white/30 backdrop-blur-md border border-white/20"
       style={{ 
         left: position.x, 
         top: position.y, 
         width: size.width, 
         height: size.height,
-        background: '#F8EBD9', 
-        border: '2px solid #db8b44',
-        minWidth: '240px',
-        minHeight: '320px'
+        minWidth: '220px',
+        minHeight: '360px',
+        color: '#4A2C2A'
       }}
       onMouseDown={onDragStart}
     >
       {/* Resize handles */}
       <div 
-        className="absolute top-0 left-0 w-8 h-8 cursor-nw-resize z-40"
+        className="absolute top-0 left-0 w-4 h-4 cursor-nwse-resize z-40"
         onMouseDown={(e) => onResizeStart(e, 'nw')}
       />
       <div 
-        className="absolute top-0 right-0 w-8 h-8 cursor-ne-resize z-40"
+        className="absolute top-0 right-0 w-4 h-4 cursor-nesw-resize z-40"
         onMouseDown={(e) => onResizeStart(e, 'ne')}
       />
       <div 
-        className="absolute bottom-0 left-0 w-8 h-8 cursor-sw-resize z-40"
+        className="absolute bottom-0 left-0 w-4 h-4 cursor-nesw-resize z-40"
         onMouseDown={(e) => onResizeStart(e, 'sw')}
       />
       <div 
-        className="absolute bottom-0 right-0 w-8 h-8 cursor-se-resize z-40"
+        className="absolute bottom-0 right-0 w-4 h-4 cursor-nwse-resize z-40"
         onMouseDown={(e) => onResizeStart(e, 'se')}
       />
 
       {/* Content Container */}
-      <div className="p-4 h-full flex flex-col">
+      <div className="p-5 h-full flex flex-col">
         {/* Header with close and settings buttons */}
         <div className="flex justify-between items-center mb-4">
           <button
             onClick={(e) => { e.stopPropagation(); setShowSettings(true); }}
-            className="text-[#4A2C2A] hover:text-[#db8b44] transition-colors"
+            className="w-8 h-8 flex items-center justify-center text-xl text-[#4A2C2A]/70 hover:text-[#db8b44] hover:bg-black/10 rounded-full transition-colors z-20"
             style={{ pointerEvents: 'auto' }}
+            title="Settings"
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 15.5A3.5 3.5 0 0 1 8.5 12 3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5zm7.43-2.53a7.77 7.77 0 0 0 .07-.97 8.55 8.55 0 0 0-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65c-.04-.24-.25-.42-.5-.42h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11l-.07 1 .07 1-2.11 1.63c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.31.61.22l2.49-1c.52.39 1.06.73 1.69.98l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.25 1.17-.59 1.69-.98l2.49 1c.22.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64z" 
-                fill="currentColor"/>
-            </svg>
+            ⚙️
           </button>
-          <div className="text-xl font-bold text-[#4A2C2A]">Problem Bank</div>
+          <span className="text-xl font-semibold">Problem Bank</span>
           <button
             onClick={(e) => { e.stopPropagation(); onClose(); }}
-            className="text-[#4A2C2A] hover:text-[#db8b44] text-xl font-bold"
+            className="w-8 h-8 flex items-center justify-center text-2xl text-[#4A2C2A]/70 hover:text-[#db8b44] hover:bg-black/10 rounded-full transition-colors z-20"
             style={{ pointerEvents: 'auto' }}
           >
             ×
@@ -221,17 +218,17 @@ export function ProblemBank({ isOpen, onClose }: ProblemBankProps) {
 
         {/* View Mode Toggle */}
         <div className="flex justify-center mb-4">
-          <div className="flex bg-[#4A2C2A] rounded-lg p-1">
+           <div className="flex bg-black/10 rounded-full p-1">
             <button
               onClick={(e) => { e.stopPropagation(); setViewMode('daily'); }}
-              className={`px-3 py-1 rounded text-sm font-bold transition-colors ${viewMode === 'daily' ? 'bg-[#db8b44] text-white' : 'text-[#F8EBD9] hover:text-[#db8b44]'}`}
+              className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-300 ${viewMode === 'daily' ? 'bg-white/80 text-[#db8b44] shadow-sm' : 'text-[#4A2C2A]/70 hover:bg-white/30'}`}
               style={{ pointerEvents: 'auto' }}
             >
               Daily
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); setViewMode('longTerm'); }}
-              className={`px-3 py-1 rounded text-sm font-bold transition-colors ${viewMode === 'longTerm' ? 'bg-[#db8b44] text-white' : 'text-[#F8EBD9] hover:text-[#db8b44]'}`}
+              className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-300 ${viewMode === 'longTerm' ? 'bg-white/80 text-[#db8b44] shadow-sm' : 'text-[#4A2C2A]/70 hover:bg-white/30'}`}
               style={{ pointerEvents: 'auto' }}
             >
               Long Term
@@ -240,15 +237,15 @@ export function ProblemBank({ isOpen, onClose }: ProblemBankProps) {
         </div>
 
         {/* Progress Circle */}
-        <div className="relative w-40 h-40 mx-auto mb-4 flex-shrink-0" style={{ minWidth: '160px', minHeight: '160px' }}>
+        <div className="relative w-48 h-48 mx-auto my-4 flex-shrink-0">
           <svg className="w-full h-full transform -rotate-90" viewBox="0 0 200 200">
             <circle
               cx="100"
               cy="100"
               r={radius}
               fill="none"
-              stroke="#e5e7eb"
-              strokeWidth="12"
+              stroke="rgba(0,0,0,0.1)"
+              strokeWidth="16"
             />
             <circle
               cx="100"
@@ -256,37 +253,37 @@ export function ProblemBank({ isOpen, onClose }: ProblemBankProps) {
               r={radius}
               fill="none"
               stroke="#db8b44"
-              strokeWidth="12"
+              strokeWidth="16"
               strokeDasharray={circumference}
               strokeDashoffset={strokeDashoffset}
               strokeLinecap="round"
+              className="transition-all duration-500 ease-out"
             />
           </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <div className="text-3xl font-bold text-[#4A2C2A]">{currentCount}</div>
-            <div className="text-sm text-[#4A2C2A] opacity-75">
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+            <div className="text-4xl font-bold">{currentCount}</div>
+            <div className="text-sm font-medium opacity-75 -mt-1">
               {viewMode === 'daily' ? 'Today' : 'Total'} Solved
             </div>
-            <div className="text-sm text-[#db8b44]">
-              Goal: {currentGoal}
+            <div className="text-xs font-bold text-[#db8b44] mt-2">
+              GOAL: {currentGoal}
             </div>
           </div>
         </div>
 
         {/* Settings Modal */}
         {showSettings && (
-          <div className="absolute inset-0 flex items-center justify-center z-50">
+          <div className="absolute inset-0 flex items-center justify-center z-50 bg-black/20 backdrop-blur-sm" onClick={() => setShowSettings(false)}>
             <div 
-              className="bg-[#F8EBD9] p-6 rounded-lg shadow-lg min-w-[300px] max-w-[400px]" 
+              className="bg-white/80 backdrop-blur-lg p-6 rounded-2xl shadow-lg w-[300px]" 
               onClick={e => e.stopPropagation()}
               style={{ pointerEvents: 'auto' }}
             >
-              <div className="text-lg font-bold text-[#4A2C2A] mb-4">Settings</div>
+              <div className="text-lg font-bold text-center mb-4">Settings</div>
            
-              
               {/* Daily Goal */}
               <div className="mb-4">
-                <label className="block text-sm font-medium text-[#4A2C2A] mb-2">
+                <label className="block text-sm font-medium mb-1">
                   Daily Goal
                 </label>
                 <input
@@ -295,18 +292,16 @@ export function ProblemBank({ isOpen, onClose }: ProblemBankProps) {
                   value={dailyGoal}
                   onChange={(e) => {
                     const value = e.target.value;
-                    console.log('Daily goal input changed:', value);
                     if (value === '') {
                       setDailyGoal(1);
                     } else {
                       const numValue = parseInt(value);
                       if (!isNaN(numValue) && numValue > 0) {
                         setDailyGoal(numValue);
-                        console.log('Setting daily goal to:', numValue);
                       }
                     }
                   }}
-                  className="w-full px-3 py-2 border-2 border-[#db8b44] rounded text-center focus:outline-none focus:border-[#4A2C2A] bg-white"
+                  className="w-full px-3 py-2 border-none rounded-md text-center focus:outline-none focus:ring-2 focus:ring-[#db8b44] bg-black/10"
                   style={{ pointerEvents: 'auto' }}
                   onClick={(e) => e.stopPropagation()}
                   onMouseDown={(e) => e.stopPropagation()}
@@ -315,7 +310,7 @@ export function ProblemBank({ isOpen, onClose }: ProblemBankProps) {
 
               {/* Long Term Goal */}
               <div className="mb-4">
-                <label className="block text-sm font-medium text-[#4A2C2A] mb-2">
+                <label className="block text-sm font-medium mb-1">
                   Long Term Goal
                 </label>
                 <input
@@ -324,18 +319,16 @@ export function ProblemBank({ isOpen, onClose }: ProblemBankProps) {
                   value={longTermGoal}
                   onChange={(e) => {
                     const value = e.target.value;
-                    console.log('Long term goal input changed:', value);
-                    if (value === '') {
+                     if (value === '') {
                       setLongTermGoal(1);
                     } else {
                       const numValue = parseInt(value);
                       if (!isNaN(numValue) && numValue > 0) {
                         setLongTermGoal(numValue);
-                        console.log('Setting long term goal to:', numValue);
                       }
                     }
                   }}
-                  className="w-full px-3 py-2 border-2 border-[#db8b44] rounded text-center focus:outline-none focus:border-[#4A2C2A] bg-white"
+                  className="w-full px-3 py-2 border-none rounded-md text-center focus:outline-none focus:ring-2 focus:ring-[#db8b44] bg-black/10"
                   style={{ pointerEvents: 'auto' }}
                   onClick={(e) => e.stopPropagation()}
                   onMouseDown={(e) => e.stopPropagation()}
@@ -343,13 +336,13 @@ export function ProblemBank({ isOpen, onClose }: ProblemBankProps) {
               </div>
 
               {/* Close button */}
-              <div className="flex justify-end">
+              <div className="flex justify-end mt-6">
                 <button
                   onClick={() => setShowSettings(false)}
-                  className="px-4 py-2 bg-[#db8b44] text-white rounded hover:bg-[#4A2C2A] transition-colors"
+                  className="px-5 py-2 bg-[#db8b44] text-white rounded-lg hover:bg-[#c57a3d] transition-colors font-bold shadow-md"
                   style={{ pointerEvents: 'auto' }}
                 >
-                  Close
+                  Done
                 </button>
               </div>
             </div>
@@ -357,67 +350,63 @@ export function ProblemBank({ isOpen, onClose }: ProblemBankProps) {
         )}
 
         {/* Problem Categories */}
-        <div className="flex justify-between mb-4 text-sm">
-          <div className="text-center">
-            <div className="font-bold text-[#4A2C2A]">Easy</div>
-            <div className="text-[#db8b44]">{categories.easy}</div>
+        <div className="grid grid-cols-3 gap-3 text-center mb-4">
+          <div>
+            <div className="font-bold text-2xl" style={{color: '#34D399'}}>{categories.easy}</div>
+            <div className="text-xs font-medium opacity-75">EASY</div>
           </div>
-          <div className="text-center">
-            <div className="font-bold text-[#4A2C2A]">Medium</div>
-            <div className="text-[#db8b44]">{categories.medium}</div>
+          <div>
+            <div className="font-bold text-2xl" style={{color: '#FBBF24'}}>{categories.medium}</div>
+            <div className="text-xs font-medium opacity-75">MEDIUM</div>
           </div>
-          <div className="text-center">
-            <div className="font-bold text-[#4A2C2A]">Hard</div>
-            <div className="text-[#db8b44]">{categories.hard}</div>
+          <div>
+            <div className="font-bold text-2xl" style={{color: '#F87171'}}>{categories.hard}</div>
+            <div className="text-xs font-medium opacity-75">HARD</div>
           </div>
         </div>
 
         {/* Add Problem Buttons */}
-        {size.width > 280 && size.height > 400 && (
-          <div className="flex justify-center gap-1 mb-4">
-            <button
-              onClick={(e) => { e.stopPropagation(); handleAddProblem('easy'); }}
-              className="flex-1 px-3 py-2 bg-green-500 text-white rounded text-sm hover:bg-green-600 transition-colors"
-              style={{ pointerEvents: 'auto' }}
-            >
-              + Easy
-            </button>
-            <button
-              onClick={(e) => { e.stopPropagation(); handleAddProblem('medium'); }}
-              className="flex-1 px-3 py-2 bg-yellow-500 text-white rounded text-sm hover:bg-yellow-600 transition-colors"
-              style={{ pointerEvents: 'auto' }}
-            >
-              + Medium
-            </button>
-            <button
-              onClick={(e) => { e.stopPropagation(); handleAddProblem('hard'); }}
-              className="flex-1 px-3 py-2 bg-red-500 text-white rounded text-sm hover:bg-red-600 transition-colors"
-              style={{ pointerEvents: 'auto' }}
-            >
-              + Hard
-            </button>
-          </div>
-        )}
+        <div className="flex justify-center gap-3 mb-4">
+          <button
+            onClick={(e) => { e.stopPropagation(); handleAddProblem('easy'); }}
+            className="flex-1 py-3 bg-green-500/20 text-green-800 rounded-lg text-sm font-bold hover:bg-green-500/30 transition-colors"
+            style={{ pointerEvents: 'auto' }}
+          >
+            + Easy
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); handleAddProblem('medium'); }}
+            className="flex-1 py-3 bg-yellow-400/20 text-yellow-800 rounded-lg text-sm font-bold hover:bg-yellow-400/30 transition-colors"
+            style={{ pointerEvents: 'auto' }}
+          >
+            + Medium
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); handleAddProblem('hard'); }}
+            className="flex-1 py-3 bg-red-400/20 text-red-800 rounded-lg text-sm font-bold hover:bg-red-400/30 transition-colors"
+            style={{ pointerEvents: 'auto' }}
+          >
+            + Hard
+          </button>
+        </div>
 
         {/* Clear Button */}
-        {size.width > 280 && size.height > 400 && (
-          <div className="flex justify-center mt-auto">
-            <button
-              onClick={(e) => { 
-                e.stopPropagation(); 
-                if (viewMode === 'daily') {
-                  handleClear();
-                } else {
-                  handleClearLongTerm();
-                }
-              }}
-              className="px-4 py-2 bg-[#4A2C2A] text-white rounded-lg hover:bg-[#db8b44] transition-colors"
-              style={{ pointerEvents: 'auto' }}
-            >
-              Clear {viewMode === 'daily' ? 'Daily' : 'Long Term'}
-            </button>
-          </div>
-        )}
+        <div className="flex justify-center mt-auto">
+          <button
+            onClick={(e) => { 
+              e.stopPropagation(); 
+              if (viewMode === 'daily') {
+                handleClear();
+              } else {
+                handleClearLongTerm();
+              }
+            }}
+            className="px-5 py-2 bg-black/10 text-[#4A2C2A]/80 rounded-lg hover:bg-black/20 hover:text-[#4A2C2A] transition-colors text-sm font-bold"
+            style={{ pointerEvents: 'auto' }}
+          >
+            Clear {viewMode === 'daily' ? 'Daily Stats' : 'Long Term Stats'}
+          </button>
+        </div>
       </div>
     </div>
   );
