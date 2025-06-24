@@ -42,10 +42,7 @@ export function ProblemBank({ isOpen, onClose }: ProblemBankProps) {
   useEffect(() => {
     function onMouseMove(e: MouseEvent) {
       if (dragging) {
-        setPosition({
-          x: e.clientX - rel.x,
-          y: e.clientY - rel.y,
-        });
+        setPosition(clampPosition({ x: e.clientX - rel.x, y: e.clientY - rel.y }, size));
       } else if (resizing) {
         const newSize = { ...size };
         const newPosition = { ...position };
@@ -158,6 +155,27 @@ export function ProblemBank({ isOpen, onClose }: ProblemBankProps) {
       categories
     }));
   }, [problemCount, dailyGoal, longTermGoal, longTermCount, categories]);
+
+  function clampPosition(pos: {x: number, y: number}, size: {width: number, height: number}) {
+    const maxX = window.innerWidth - size.width;
+    const maxY = window.innerHeight - size.height;
+    return {
+      x: Math.max(0, Math.min(pos.x, maxX)),
+      y: Math.max(0, Math.min(pos.y, maxY)),
+    };
+  }
+
+  useEffect(() => {
+    function handleResize() {
+      setPosition(prev => clampPosition(prev, size));
+      setSize(prev => ({
+        width: Math.min(prev.width, window.innerWidth),
+        height: Math.min(prev.height, window.innerHeight)
+      }));
+    }
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [size]);
 
   if (!isOpen) return null;
 
