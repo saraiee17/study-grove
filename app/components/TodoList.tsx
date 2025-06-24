@@ -12,6 +12,16 @@ interface TodoListProps {
   onClose: () => void;
 }
 
+// Clamp position utility
+function clampPosition(pos: {x: number, y: number}, size: {width: number, height: number}) {
+  const maxX = window.innerWidth - size.width;
+  const maxY = window.innerHeight - size.height;
+  return {
+    x: Math.max(0, Math.min(pos.x, maxX)),
+    y: Math.max(0, Math.min(pos.y, maxY)),
+  };
+}
+
 export function TodoList({ isOpen, onClose }: TodoListProps) {
   const [todos, setTodos] = useState<TodoItem[]>([]);
   const [newTodoText, setNewTodoText] = useState('');
@@ -61,10 +71,7 @@ export function TodoList({ isOpen, onClose }: TodoListProps) {
   useEffect(() => {
     function onMouseMove(e: MouseEvent) {
       if (dragging) {
-        setPosition({
-          x: e.clientX - rel.x,
-          y: e.clientY - rel.y,
-        });
+        setPosition(clampPosition({ x: e.clientX - rel.x, y: e.clientY - rel.y }, size));
       } else if (resizing) {
         const newSize = { ...size };
         const newPosition = { ...position };
@@ -87,7 +94,7 @@ export function TodoList({ isOpen, onClose }: TodoListProps) {
         }
         
         setSize(newSize);
-        setPosition(newPosition);
+        setPosition(clampPosition(newPosition, newSize));
       }
     }
     
@@ -106,6 +113,19 @@ export function TodoList({ isOpen, onClose }: TodoListProps) {
       window.removeEventListener("mouseup", onMouseUp);
     };
   }, [dragging, resizing, resizeDirection, rel, size, position]);
+
+  // Add window resize effect to keep panel in view
+  useEffect(() => {
+    function handleResize() {
+      setPosition(prev => clampPosition(prev, size));
+      setSize(prev => ({
+        width: Math.min(prev.width, window.innerWidth),
+        height: Math.min(prev.height, window.innerHeight)
+      }));
+    }
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [size]);
 
   const onDragStart = (e: React.MouseEvent) => {
     if (!todoListRef.current) return;
