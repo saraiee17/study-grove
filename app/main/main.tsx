@@ -57,9 +57,9 @@ export function Main() {
   const [previewVideoRef] = useState(useRef<HTMLVideoElement | null>(null));
   const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
   const [playTrigger, setPlayTrigger] = useState(0);
-  const [showPlayOverlay, setShowPlayOverlay] = useState(false);
   const youtubePlayerRef = useRef<any>(null);
   const [ytPlayer, setYtPlayer] = useState<any>(null);
+  const [videoPaused, setVideoPaused] = useState(false);
 
   useEffect(() => {
     if (!window.YT) {
@@ -80,7 +80,7 @@ export function Main() {
       const handleCanPlay = () => {
         setIsVideoLoading(false);
         // If triggered by a screen change, play the video
-        if (playTrigger > 0) {
+        if (playTrigger > 0 && !videoPaused) {
           video.play().catch(err => {
             console.warn("Video play failed on trigger:", err);
           });
@@ -114,7 +114,7 @@ export function Main() {
         video.removeEventListener('play', handlePlay);
       };
     }
-  }, [isMuted, currentScreen, playTrigger]);
+  }, [isMuted, currentScreen, playTrigger, videoPaused]);
 
   // Try to play audio on mount, show hint if blocked
   useEffect(() => {
@@ -158,12 +158,13 @@ export function Main() {
       const video = videoRef.current;
       if (video) {
         video.load();
-        video.play().then(() => {
-          setShowPlayOverlay(false);
-        }).catch((err) => {
-          setShowPlayOverlay(true);
-          console.warn('Immediate video play failed:', err);
-        });
+        if (!videoPaused) {
+          video.play().catch((err) => {
+            console.warn('Immediate video play failed:', err);
+          });
+        } else {
+          video.pause();
+        }
       }
     }, 10);
   };
@@ -290,20 +291,27 @@ export function Main() {
       video.addEventListener('canplay', onCanPlay);
 
       playTimeout = setTimeout(() => {
-        video.play().then(() => {
-          video.currentTime = 0;
-          console.log('Video play() resolved and seeked to 0:', screenOptions[currentScreen].name);
-        }).catch((err) => {
-          console.warn('Video play failed after screen switch:', err);
-        });
+        if (!videoPaused) {
+          video.play().then(() => {
+            video.currentTime = 0;
+            console.log('Video play() resolved and seeked to 0:', screenOptions[currentScreen].name);
+          }).catch((err) => {
+            console.warn('Video play failed after screen switch:', err);
+          });
+        } else {
+          video.pause();
+        }
       }, 100);
 
-      fallbackTimeout = setTimeout(() => {
-        if (video.paused || video.currentTime === 0) {
-          console.warn('Video did not start, retrying play():', screenOptions[currentScreen].name);
-          video.play().catch(() => {});
-        }
-      }, 1200);
+      // Only set fallbackTimeout if not paused
+      if (!videoPaused) {
+        fallbackTimeout = setTimeout(() => {
+          if (video.paused || video.currentTime === 0) {
+            console.warn('Video did not start, retrying play():', screenOptions[currentScreen].name);
+            video.play().catch(() => {});
+          }
+        }, 1200);
+      }
 
       return () => {
         video.removeEventListener('playing', onPlaying);
@@ -312,9 +320,28 @@ export function Main() {
         if (fallbackTimeout) clearTimeout(fallbackTimeout);
       };
     }
-  }, [currentScreen]);
+  }, [currentScreen, videoPaused]);
 
   console.log('Rendering video:', screenOptions[currentScreen].video, 'isVideoLoading:', isVideoLoading);
+
+  // Add new icon for background video: monitor with play/pause
+  const MonitorPlayPauseIcon = ({ paused }: { paused: boolean }) => (
+    <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="4" y="7" width="24" height="14" rx="3" fill="#db8b44" stroke="#58290b" strokeWidth="2"/>
+      {/* Stand */}
+      <rect x="13" y="23" width="6" height="2" rx="1" fill="#58290b" />
+      <rect x="10" y="25" width="12" height="2" rx="1" fill="#58290b" />
+      {/* Play or Pause symbol */}
+      {paused ? (
+        <polygon points="13,11 21,16 13,21" fill="white" />
+      ) : (
+        <>
+          <rect x="13.5" y="12" width="2" height="8" rx="1" fill="white" />
+          <rect x="17.5" y="12" width="2" height="8" rx="1" fill="white" />
+        </>
+      )}
+    </svg>
+  );
 
   return (
     <PageTransition>
@@ -366,118 +393,148 @@ export function Main() {
         </div>
 
         {/* Top-Left Buttons Container */}
-        <div className="absolute top-4 left-4 z-10 flex gap-2">
-          {/* Logo Button */}
-          <button 
-            className="w-12 h-12 p-2 rounded-full bg-[#F8EBD9] hover:opacity-80 transition-all duration-300 hover:scale-110 shadow-sm flex items-center justify-center"
-            onClick={() => {}}
-          >
-            <img 
-              src={studyGroveLogo} 
-              alt="StudyGrove Logo" 
-              className="w-8 h-8"
-            />
-          </button>
+        <div className="absolute top-4 left-4 z-10 flex flex-col items-center">
+          <div className="flex gap-2 items-center">
+            {/* Logo Button */}
+            <button 
+              className="w-12 h-12 p-2 rounded-full bg-[#F8EBD9] hover:opacity-80 transition-all duration-300 hover:scale-110 shadow-sm flex items-center justify-center"
+              onClick={() => {}}
+              aria-label="Home"
+            >
+              <img 
+                src={studyGroveLogo} 
+                alt="StudyGrove Logo" 
+                className="w-8 h-8"
+              />
+            </button>
 
-          {/* Audio Play/Pause Circle Button */}
-          <button
-            onClick={toggleAudio}
-            className="w-12 h-12 p-2 rounded-full bg-[#F8EBD9] hover:opacity-80 transition-all duration-300 hover:scale-110 shadow-sm flex items-center justify-center"
-            title={audioPlaying ? "Pause Audio" : "Play Audio"}
-          >
-            {audioPlaying ? (
+            {/* Audio Play/Pause Circle Button */}
+            <button
+              onClick={toggleAudio}
+              className="w-12 h-12 p-2 rounded-full bg-[#F8EBD9] hover:opacity-80 transition-all duration-300 hover:scale-110 shadow-sm flex items-center justify-center"
+              title={audioPlaying ? "Pause Audio" : "Play Audio"}
+              aria-label={audioPlaying ? "Pause Background Audio" : "Play Background Audio"}
+            >
+              {audioPlaying ? (
+                <svg
+                  width="32"
+                  height="32"
+                  viewBox="0 0 64 64"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <rect
+                    x="18"
+                    y="16"
+                    width="8"
+                    height="32"
+                    fill="#db8b44"
+                    stroke="#58290b"
+                    strokeWidth="2"
+                    rx="1"
+                  />
+                  <rect
+                    x="38"
+                    y="16"
+                    width="8"
+                    height="32"
+                    fill="#db8b44"
+                    stroke="#58290b"
+                    strokeWidth="2"
+                    rx="1"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  width="32"
+                  height="32"
+                  viewBox="0 0 64 64"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <polygon
+                    points="20,16 48,32 20,48"
+                    fill="#db8b44"
+                    stroke="#58290b"
+                    strokeWidth="2"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              )}
+            </button>
+
+            {/* Background Video Button */}
+            <button
+              onClick={() => {
+                const video = videoRef.current;
+                if (video) {
+                  if (videoPaused) {
+                    video.play();
+                    setVideoPaused(false);
+                  } else {
+                    video.pause();
+                    setVideoPaused(true);
+                  }
+                }
+              }}
+              className="w-12 h-12 p-2 rounded-full bg-[#F8EBD9] hover:opacity-80 transition-all duration-300 hover:scale-110 shadow-sm flex items-center justify-center"
+              aria-pressed={videoPaused}
+              aria-label={videoPaused ? 'Play Background Video' : 'Pause Background Video'}
+              title={videoPaused ? 'Play Background Video' : 'Pause Background Video'}
+            >
+              <MonitorPlayPauseIcon paused={videoPaused} />
+            </button>
+
+            {/* Timer Button */}
+            <button 
+              className="w-12 h-12 p-2 rounded-full bg-[#F8EBD9] hover:opacity-80 transition-all duration-300 hover:scale-110 shadow-sm flex items-center justify-center"
+              onClick={() => setTimerOpen(!timerOpen)}
+              aria-label="Open Timer"
+            >
+              <img src={clock} alt="clock" className="w-8 h-8" />
+            </button>
+
+            {/* Problem Bank Button */}
+            <button 
+              className="w-12 h-12 p-2 rounded-full bg-[#F8EBD9] hover:opacity-80 transition-all duration-300 hover:scale-110 shadow-sm flex items-center justify-center"
+              onClick={() => setProblemBankOpen(!problemBankOpen)}
+              aria-label="Open Problem Bank"
+            >
               <svg
-                width="32"
-                height="32"
-                viewBox="0 0 64 64"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <rect
-                  x="18"
-                  y="16"
-                  width="8"
-                  height="32"
+                <path
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"
                   fill="#db8b44"
-                  stroke="#58290b"
-                  strokeWidth="2"
-                  rx="1"
-                />
-                <rect
-                  x="38"
-                  y="16"
-                  width="8"
-                  height="32"
-                  fill="#db8b44"
-                  stroke="#58290b"
-                  strokeWidth="2"
-                  rx="1"
                 />
               </svg>
-            ) : (
+            </button>
+
+            {/* Todo List Button */}
+            <button 
+              className="w-12 h-12 p-2 rounded-full bg-[#F8EBD9] hover:opacity-80 transition-all duration-300 hover:scale-110 shadow-sm flex items-center justify-center"
+              onClick={() => setTodoListOpen(!todoListOpen)}
+              aria-label="Open Todo List"
+            >
               <svg
-                width="32"
-                height="32"
-                viewBox="0 0 64 64"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <polygon
-                  points="20,16 48,32 20,48"
+                <path
+                  d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"
                   fill="#db8b44"
-                  stroke="#58290b"
-                  strokeWidth="2"
-                  strokeLinejoin="round"
                 />
               </svg>
-            )}
-          </button>
-
-          {/* Timer Button */}
-          <button 
-            className="w-12 h-12 p-2 rounded-full bg-[#F8EBD9] hover:opacity-80 transition-all duration-300 hover:scale-110 shadow-sm flex items-center justify-center"
-            onClick={() => setTimerOpen(!timerOpen)}
-          >
-            <img src={clock} alt="clock" className="w-8 h-8" />
-          </button>
-
-          {/* Problem Bank Button */}
-          <button 
-            className="w-12 h-12 p-2 rounded-full bg-[#F8EBD9] hover:opacity-80 transition-all duration-300 hover:scale-110 shadow-sm flex items-center justify-center"
-            onClick={() => setProblemBankOpen(!problemBankOpen)}
-          >
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"
-                fill="#db8b44"
-              />
-            </svg>
-          </button>
-
-          {/* Todo List Button */}
-          <button 
-            className="w-12 h-12 p-2 rounded-full bg-[#F8EBD9] hover:opacity-80 transition-all duration-300 hover:scale-110 shadow-sm flex items-center justify-center"
-            onClick={() => setTodoListOpen(!todoListOpen)}
-          >
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"
-                fill="#db8b44"
-              />
-            </svg>
-          </button>
+            </button>
+          </div>
+     
         </div>
 
         {/* Timer Widget */}
@@ -547,23 +604,6 @@ export function Main() {
                 ))}
               </div>
             </div>
-          </div>
-        )}
-
-        {/* Play Background Overlay Fallback */}
-        {showPlayOverlay && (
-          <div className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none">
-            <button
-              className="px-6 py-3 rounded-lg bg-[#db8b44] text-white text-lg font-bold shadow-lg pointer-events-auto hover:bg-[#4A2C2A] transition-colors"
-              onClick={() => {
-                const video = videoRef.current;
-                if (video) {
-                  video.play().then(() => setShowPlayOverlay(false));
-                }
-              }}
-            >
-              ▶ Play Background
-            </button>
           </div>
         )}
 
