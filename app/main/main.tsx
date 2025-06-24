@@ -7,6 +7,14 @@ import sunsetcliff from "../assets/sunsetcliff.png";
 import sunsetstreet from "../assets/sunsetstreet.png";
 import sunsetcliffVideo from "../assets/sunsetcliff.mp4";
 import sunsetstreetVideo from "../assets/sunsetstreet.mp4";
+import beachfrontCafe from "../assets/beachfront cafe.mp4";
+import beachfrontCafeThumb from "../assets/beachfront cafe.png";
+import raindayCafe from "../assets/rainday cafe.mp4";
+import raindayCafeThumb from "../assets/rainy day cafe.png";
+import indoorGarden from "../assets/indoor garden.mp4";
+import indoorGardenThumb from "../assets/indoor garden.png";
+import shire from "../assets/shire.mp4";
+import shireThumb from "../assets/shire.png";
 import { PageTransition } from "../components/PageTransition";
 import { Timer } from "../components/Timer";
 import { ProblemBank } from "../components/ProblemBank";
@@ -31,6 +39,30 @@ const screenOptions = [
     name: 'Sunset Street',
     video: sunsetstreetVideo,
     thumbnail: sunsetstreet
+  },
+  {
+    id: 'indoor-garden',
+    name: 'Indoor Garden',
+    video: indoorGarden,
+    thumbnail: indoorGardenThumb
+  },
+  {
+    id: 'shire',
+    name: 'Shire',
+    video: shire,
+    thumbnail: shireThumb
+  },
+  {
+    id: 'beachfront-cafe',
+    name: 'Beachfront Cafe',
+    video: beachfrontCafe,
+    thumbnail: beachfrontCafeThumb
+  },
+  {
+    id: 'rainday-cafe',
+    name: 'Rainy Day Cafe',
+    video: raindayCafe,
+    thumbnail: raindayCafeThumb
   }
 ];
 
