@@ -318,17 +318,14 @@ export function TodoList({ isOpen, onClose }: TodoListProps) {
                       ? 'bg-black/5 text-[#4A2C2A]/50' 
                       : 'bg-white/40 hover:bg-white/60'
                   }`}
-                  onClick={() => toggleTodo(todo.id)}
                 >
                   <div className="flex items-center">
                     <input
                       type="checkbox"
                       checked={todo.completed}
-                      onChange={() => {}} // The parent div handles the click
+                      onChange={() => toggleTodo(todo.id)}
                       className="w-5 h-5 text-[#db8b44] bg-transparent border-2 border-[#4A2C2A]/30 rounded focus:ring-offset-0 focus:ring-2 focus:ring-[#db8b44] transition"
                       style={{ pointerEvents: 'auto' }}
-                      onClick={(e) => e.stopPropagation()} // Prevent double-toggle
-                      onMouseDown={(e) => e.stopPropagation()}
                     />
                   </div>
                   <span
