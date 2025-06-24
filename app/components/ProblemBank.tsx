@@ -112,6 +112,15 @@ export function ProblemBank({ isOpen, onClose }: ProblemBankProps) {
     }));
   };
 
+  const handleRemoveProblem = (difficulty: 'easy' | 'medium' | 'hard') => {
+    setCategories(prev => ({
+      ...prev,
+      [difficulty]: Math.max(0, prev[difficulty] - 1)
+    }));
+    setProblemCount(prev => Math.max(0, prev - 1));
+    setLongTermCount(prev => Math.max(0, prev - 1));
+  };
+
   const handleClear = () => {
     setProblemCount(0);
     setCategories({
@@ -298,7 +307,6 @@ export function ProblemBank({ isOpen, onClose }: ProblemBankProps) {
               style={{ pointerEvents: 'auto' }}
             >
               <div className="text-lg font-bold text-center mb-4">Settings</div>
-           
               {/* Daily Goal */}
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-1">
@@ -325,7 +333,6 @@ export function ProblemBank({ isOpen, onClose }: ProblemBankProps) {
                   onMouseDown={(e) => e.stopPropagation()}
                 />
               </div>
-
               {/* Long Term Goal */}
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-1">
@@ -352,7 +359,46 @@ export function ProblemBank({ isOpen, onClose }: ProblemBankProps) {
                   onMouseDown={(e) => e.stopPropagation()}
                 />
               </div>
-
+              {/* Remove Problems Section */}
+              <div className="mb-4">
+                <div className="block text-sm font-medium mb-2 text-center">Remove Problems</div>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-green-700 font-bold">Easy</span>
+                  <span>{categories.easy}</span>
+                  <button
+                    onClick={() => handleRemoveProblem('easy')}
+                    className="px-2 py-1 bg-green-500/10 text-green-800 rounded text-xs font-bold hover:bg-green-500/20 transition-colors"
+                    style={{ pointerEvents: 'auto' }}
+                    disabled={categories.easy === 0}
+                  >
+                    -
+                  </button>
+                </div>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-yellow-700 font-bold">Medium</span>
+                  <span>{categories.medium}</span>
+                  <button
+                    onClick={() => handleRemoveProblem('medium')}
+                    className="px-2 py-1 bg-yellow-400/10 text-yellow-800 rounded text-xs font-bold hover:bg-yellow-400/20 transition-colors"
+                    style={{ pointerEvents: 'auto' }}
+                    disabled={categories.medium === 0}
+                  >
+                    -
+                  </button>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-red-700 font-bold">Hard</span>
+                  <span>{categories.hard}</span>
+                  <button
+                    onClick={() => handleRemoveProblem('hard')}
+                    className="px-2 py-1 bg-red-400/10 text-red-800 rounded text-xs font-bold hover:bg-red-400/20 transition-colors"
+                    style={{ pointerEvents: 'auto' }}
+                    disabled={categories.hard === 0}
+                  >
+                    -
+                  </button>
+                </div>
+              </div>
               {/* Close button */}
               <div className="flex justify-end mt-6">
                 <button
