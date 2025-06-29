@@ -5,7 +5,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Chomp', 'system-ui', 'sans-serif'],
+        sans: ['Comfortaa', 'system-ui', 'sans-serif'],
+        title: ['Chewy', 'system-ui', 'sans-serif'],
       },
     },
   },

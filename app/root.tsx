@@ -10,6 +10,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Study Grove</title>
         
+        {/* Google Fonts */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link href="https://fonts.googleapis.com/css2?family=Chewy&family=Comfortaa:wght@300..700&display=swap" rel="stylesheet" />
+        
         {/* Favicon setup */}
         <link rel="icon" type="image/png" sizes="32x32" href={studyGroveLogo} />
         <link rel="icon" type="image/png" sizes="16x16" href={studyGroveLogo} />

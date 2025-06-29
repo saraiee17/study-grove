@@ -16,8 +16,8 @@ export function Welcome() {
         onClick={handleClick}
       >
         <div className="flex flex-col items-center flex-grow justify-center gap-4" style={{ minHeight: '60vh' }}>
-          <div className="flex items-end gap-2 mt-24">
-            <h1 className="font-['Chomp'] text-5xl font-black text-[#4A2C2A] dark:text-[#4A2C2A] tracking-[0.2em] transition-transform duration-500 hover:scale-105">
+          <div className="flex items-end gap-1 mt-24">
+            <h1 className="text-5xl font-medium text-[#4A2C2A] dark:text-[#4A2C2A] tracking-[0.2em] transition-transform duration-500 hover:scale-105" style={{ fontFamily: 'Chewy, system-ui, sans-serif' }}>
               StudyGrove
             </h1>
             <img 

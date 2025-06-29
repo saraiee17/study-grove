@@ -328,7 +328,7 @@ export function Timer({ isOpen, onClose, clockIcon }: TimerProps) {
             {size.width >= 270 && (
               <div className="flex items-center gap-2">
                 <img src={clockIcon} alt="clock" className="w-6 h-6" />
-                <span className="text-lg font-semibold">Pomodoro Timer</span>
+                <span className="text-lg font-semibold" style={{ fontFamily: 'Chewy, system-ui, sans-serif' }}>Pomodoro Timer</span>
               </div>
             )}
             
@@ -359,7 +359,7 @@ export function Timer({ isOpen, onClose, clockIcon }: TimerProps) {
           
           {showSettings ? (
             <div className="mb-4 p-4 rounded-lg bg-black/5 flex-1">
-              <div className="text-md font-semibold text-[#4A2C2A] mb-3 text-center">Timer Settings</div>
+              <div className="text-md font-semibold text-[#4A2C2A] mb-3 text-center" style={{ fontFamily: 'Chewy, system-ui, sans-serif' }}>Timer Settings</div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-bold mb-1 block">Work (min)</label>
@@ -454,7 +454,7 @@ export function Timer({ isOpen, onClose, clockIcon }: TimerProps) {
               
               {/* Timer Display */}
               <div className="text-center mb-6 flex-1 flex flex-col justify-center items-center">
-                <div className="text-7xl font-sans font-bold mb-1" style={{ color: '#4A2C2A' }}>
+                <div className="text-7xl font-bold mb-1" style={{ color: '#4A2C2A', fontFamily: 'Chewy, system-ui, sans-serif' }}>
                   {formatTime(timeLeft)}
                 </div>
                 {size.height >= 340 && (

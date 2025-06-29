@@ -1,13 +1,5 @@
 @import "tailwindcss";
-
-/* Debug font loading */
-@font-face {
-  font-family: 'Chomp';
-  src: url('/fonts/Chomp.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: block; /* Changed from swap to block to ensure font loads */
-}
+@import url('https://fonts.googleapis.com/css2?family=Chewy&family=Comfortaa:wght@300..700&display=swap');
 
 /* Direct styles outside of layers */
 html {
@@ -30,9 +22,4 @@ body {
   min-height: 100vh;
   margin: 0;
   padding: 0;
-}
-
-/* Force Chomp on all text for testing */
-* {
-  font-family: 'Chomp', sans-serif !important;
 }

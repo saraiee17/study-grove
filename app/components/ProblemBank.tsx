@@ -233,7 +233,7 @@ export function ProblemBank({ isOpen, onClose }: ProblemBankProps) {
           >
             ⚙️
           </button>
-          <span className="text-xl font-semibold">Problem Bank</span>
+          <span className="text-xl font-semibold" style={{ fontFamily: 'Chewy, system-ui, sans-serif' }}>Problem Bank</span>
           <button
             onClick={(e) => { e.stopPropagation(); onClose(); }}
             className="w-8 h-8 flex items-center justify-center text-2xl text-[#4A2C2A]/70 hover:text-[#db8b44] hover:bg-black/10 rounded-full transition-colors z-20"
@@ -288,7 +288,7 @@ export function ProblemBank({ isOpen, onClose }: ProblemBankProps) {
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-            <div className="text-4xl font-bold">{currentCount}</div>
+            <div className="text-4xl font-bold" style={{ fontFamily: 'Chewy, system-ui, sans-serif' }}>{currentCount}</div>
             <div className="text-sm font-medium opacity-75 -mt-1">
               {viewMode === 'daily' ? 'Today' : 'Total'} Solved
             </div>
@@ -306,7 +306,7 @@ export function ProblemBank({ isOpen, onClose }: ProblemBankProps) {
               onClick={e => e.stopPropagation()}
               style={{ pointerEvents: 'auto' }}
             >
-              <div className="text-lg font-bold text-center mb-4">Settings</div>
+              <div className="text-lg font-bold text-center mb-4" style={{ fontFamily: 'Chewy, system-ui, sans-serif' }}>Settings</div>
               {/* Daily Goal */}
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-1">
@@ -416,15 +416,15 @@ export function ProblemBank({ isOpen, onClose }: ProblemBankProps) {
         {/* Problem Categories */}
         <div className="grid grid-cols-3 gap-3 text-center mb-4">
           <div>
-            <div className="font-bold text-2xl" style={{color: '#34D399'}}>{categories.easy}</div>
+            <div className="font-bold text-2xl" style={{color: '#34D399', fontFamily: 'Chewy, system-ui, sans-serif'}}>{categories.easy}</div>
             <div className="text-xs font-medium opacity-75">EASY</div>
           </div>
           <div>
-            <div className="font-bold text-2xl" style={{color: '#FBBF24'}}>{categories.medium}</div>
+            <div className="font-bold text-2xl" style={{color: '#FBBF24', fontFamily: 'Chewy, system-ui, sans-serif'}}>{categories.medium}</div>
             <div className="text-xs font-medium opacity-75">MEDIUM</div>
           </div>
           <div>
-            <div className="font-bold text-2xl" style={{color: '#F87171'}}>{categories.hard}</div>
+            <div className="font-bold text-2xl" style={{color: '#F87171', fontFamily: 'Chewy, system-ui, sans-serif'}}>{categories.hard}</div>
             <div className="text-xs font-medium opacity-75">HARD</div>
           </div>
         </div>
