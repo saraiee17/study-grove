@@ -277,13 +277,19 @@ export function TodoList({ isOpen, onClose }: TodoListProps) {
         <div className="mb-4">
           <div className="text-sm font-medium text-[#4A2C2A] mb-2 text-center">
             {activeTab === 'done' ? `${completedCount} completed` : 
-             activeTab === 'study' ? `${studyCount} study, ${studyCompletedCount} completed` :
-             `${lifeCount} life, ${lifeCompletedCount} completed`}
+             activeTab === 'study' ? `${studyCompletedCount} of ${studyCount + studyCompletedCount} completed` :
+             `${lifeCompletedCount} of ${lifeCount + lifeCompletedCount} completed`}
           </div>
           <div className="w-full bg-black/10 rounded-full h-2.5">
             <div 
               className="bg-[#db8b44] h-2.5 rounded-full transition-all duration-500 ease-out"
-              style={{ width: `${totalCount > 0 ? (completedCount / totalCount) * 100 : 0}%` }}
+              style={{ 
+                width: activeTab === 'done' 
+                  ? `${totalCount > 0 ? (completedCount / totalCount) * 100 : 0}%`
+                  : activeTab === 'study'
+                  ? `${(studyCount + studyCompletedCount) > 0 ? (studyCompletedCount / (studyCount + studyCompletedCount)) * 100 : 0}%`
+                  : `${(lifeCount + lifeCompletedCount) > 0 ? (lifeCompletedCount / (lifeCount + lifeCompletedCount)) * 100 : 0}%`
+              }}
             ></div>
           </div>
         </div>
