@@ -5,6 +5,7 @@ interface TodoItem {
   text: string;
   completed: boolean;
   priority: 'low' | 'medium' | 'high';
+  category: 'study' | 'life';
 }
 
 interface TodoListProps {
@@ -25,7 +26,7 @@ function clampPosition(pos: {x: number, y: number}, size: {width: number, height
 export function TodoList({ isOpen, onClose }: TodoListProps) {
   const [todos, setTodos] = useState<TodoItem[]>([]);
   const [newTodoText, setNewTodoText] = useState('');
-  const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
+  const [activeTab, setActiveTab] = useState<'study' | 'life' | 'done'>('study');
 
   // Position and size state
   const [position, setPosition] = useState({ x: 200, y: 100 });
@@ -47,8 +48,8 @@ export function TodoList({ isOpen, onClose }: TodoListProps) {
           if (Array.isArray(data.todos)) {
             setTodos(data.todos);
           }
-          if (['all', 'active', 'completed'].includes(data.filter)) {
-            setFilter(data.filter);
+          if (['study', 'life', 'done'].includes(data.activeTab)) {
+            setActiveTab(data.activeTab);
           }
         }
       }
@@ -60,12 +61,12 @@ export function TodoList({ isOpen, onClose }: TodoListProps) {
   // Save state to localStorage whenever todos or filter change
   useEffect(() => {
     try {
-      const dataToSave = JSON.stringify({ todos, filter });
+      const dataToSave = JSON.stringify({ todos, activeTab });
       localStorage.setItem('studygrove-todolist', dataToSave);
     } catch (error) {
       console.error("Failed to save todos to localStorage", error);
     }
-  }, [todos, filter]);
+  }, [todos, activeTab]);
 
   // Drag and resize logic
   useEffect(() => {
@@ -151,10 +152,13 @@ export function TodoList({ isOpen, onClose }: TodoListProps) {
         id: Date.now().toString(),
         text: newTodoText.trim(),
         completed: false,
-        priority: 'medium'
+        priority: 'medium',
+        category: activeTab === 'done' ? 'study' : activeTab // Default to study if on done tab
       };
       setTodos(prev => [...prev, newTodo]);
       setNewTodoText('');
+      // Switch to the appropriate category tab after adding
+      setActiveTab(activeTab === 'done' ? 'study' : activeTab);
     }
   };
 
@@ -179,13 +183,19 @@ export function TodoList({ isOpen, onClose }: TodoListProps) {
   };
 
   const filteredTodos = todos.filter(todo => {
-    if (filter === 'active') return !todo.completed;
-    if (filter === 'completed') return todo.completed;
-    return true;
+    if (activeTab === 'done') {
+      return todo.completed;
+    } else {
+      return todo.category === activeTab && !todo.completed;
+    }
   });
 
   const completedCount = todos.filter(todo => todo.completed).length;
   const totalCount = todos.length;
+  const studyCount = todos.filter(todo => todo.category === 'study' && !todo.completed).length;
+  const lifeCount = todos.filter(todo => todo.category === 'life' && !todo.completed).length;
+  const studyCompletedCount = todos.filter(todo => todo.category === 'study' && todo.completed).length;
+  const lifeCompletedCount = todos.filter(todo => todo.category === 'life' && todo.completed).length;
 
   if (!isOpen) return null;
 
@@ -236,39 +246,26 @@ export function TodoList({ isOpen, onClose }: TodoListProps) {
           </button>
         </div>
 
-        {/* Progress indicator */}
-        <div className="mb-4">
-          <div className="text-sm font-medium text-[#4A2C2A] mb-2 text-center">
-            {completedCount} of {totalCount} completed
-          </div>
-          <div className="w-full bg-black/10 rounded-full h-2.5">
-            <div 
-              className="bg-[#db8b44] h-2.5 rounded-full transition-all duration-500 ease-out"
-              style={{ width: `${totalCount > 0 ? (completedCount / totalCount) * 100 : 0}%` }}
-            ></div>
-          </div>
-        </div>
-
-        {/* Filter buttons */}
+        {/* Main Tabs */}
         <div className="flex justify-center mb-4">
           <div className="flex bg-black/10 rounded-full p-1">
-             <button
-              onClick={(e) => { e.stopPropagation(); setFilter('all'); }}
-              className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-300 ${filter === 'all' ? 'bg-white/80 text-[#db8b44] shadow-sm' : 'text-[#4A2C2A]/70 hover:bg-white/30'}`}
+            <button
+              onClick={(e) => { e.stopPropagation(); setActiveTab('study'); }}
+              className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-300 ${activeTab === 'study' ? 'bg-white/80 text-[#db8b44] shadow-sm' : 'text-[#4A2C2A]/70 hover:bg-white/30'}`}
               style={{ pointerEvents: 'auto' }}
             >
-              All
+              Study
             </button>
             <button
-              onClick={(e) => { e.stopPropagation(); setFilter('active'); }}
-              className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-300 ${filter === 'active' ? 'bg-white/80 text-[#db8b44] shadow-sm' : 'text-[#4A2C2A]/70 hover:bg-white/30'}`}
+              onClick={(e) => { e.stopPropagation(); setActiveTab('life'); }}
+              className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-300 ${activeTab === 'life' ? 'bg-white/80 text-[#db8b44] shadow-sm' : 'text-[#4A2C2A]/70 hover:bg-white/30'}`}
               style={{ pointerEvents: 'auto' }}
             >
-              Active
+              Life
             </button>
             <button
-              onClick={(e) => { e.stopPropagation(); setFilter('completed'); }}
-              className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-300 ${filter === 'completed' ? 'bg-white/80 text-[#db8b44] shadow-sm' : 'text-[#4A2C2A]/70 hover:bg-white/30'}`}
+              onClick={(e) => { e.stopPropagation(); setActiveTab('done'); }}
+              className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-300 ${activeTab === 'done' ? 'bg-white/80 text-[#db8b44] shadow-sm' : 'text-[#4A2C2A]/70 hover:bg-white/30'}`}
               style={{ pointerEvents: 'auto' }}
             >
               Done
@@ -276,27 +273,50 @@ export function TodoList({ isOpen, onClose }: TodoListProps) {
           </div>
         </div>
 
-        {/* Add new todo */}
-        <div className="flex gap-2 mb-4">
-          <input
-            type="text"
-            value={newTodoText}
-            onChange={(e) => setNewTodoText(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && addTodo()}
-            placeholder="Add a new task..."
-            className="flex-1 px-4 py-2 border-none rounded-lg focus:outline-none focus:ring-2 focus:ring-[#db8b44] bg-black/5 text-[#4A2C2A] placeholder:text-[#4A2C2A]/50"
-            style={{ pointerEvents: 'auto' }}
-            onClick={(e) => e.stopPropagation()}
-            onMouseDown={(e) => e.stopPropagation()}
-          />
-          <button
-            onClick={(e) => { e.stopPropagation(); addTodo(); }}
-            className="px-5 py-2 bg-[#db8b44] text-white rounded-lg hover:bg-[#c57a3d] transition-colors font-bold shadow-md"
-            style={{ pointerEvents: 'auto' }}
-          >
-            Add
-          </button>
+        {/* Progress indicator */}
+        <div className="mb-4">
+          <div className="text-sm font-medium text-[#4A2C2A] mb-2 text-center">
+            {activeTab === 'done' ? `${completedCount} completed` : 
+             activeTab === 'study' ? `${studyCompletedCount} of ${studyCount + studyCompletedCount} completed` :
+             `${lifeCompletedCount} of ${lifeCount + lifeCompletedCount} completed`}
+          </div>
+          <div className="w-full bg-black/10 rounded-full h-2.5">
+            <div 
+              className="bg-[#db8b44] h-2.5 rounded-full transition-all duration-500 ease-out"
+              style={{ 
+                width: activeTab === 'done' 
+                  ? `${totalCount > 0 ? (completedCount / totalCount) * 100 : 0}%`
+                  : activeTab === 'study'
+                  ? `${(studyCount + studyCompletedCount) > 0 ? (studyCompletedCount / (studyCount + studyCompletedCount)) * 100 : 0}%`
+                  : `${(lifeCount + lifeCompletedCount) > 0 ? (lifeCompletedCount / (lifeCount + lifeCompletedCount)) * 100 : 0}%`
+              }}
+            ></div>
+          </div>
         </div>
+
+        {/* Add new todo - only show for study and life tabs */}
+        {activeTab !== 'done' && (
+          <div className="flex gap-2 mb-4">
+            <input
+              type="text"
+              value={newTodoText}
+              onChange={(e) => setNewTodoText(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && addTodo()}
+              placeholder={`Add a new ${activeTab} task...`}
+              className="flex-1 px-4 py-2 border-none rounded-lg focus:outline-none focus:ring-2 focus:ring-[#db8b44] bg-black/5 text-[#4A2C2A] placeholder:text-[#4A2C2A]/50"
+              style={{ pointerEvents: 'auto' }}
+              onClick={(e) => e.stopPropagation()}
+              onMouseDown={(e) => e.stopPropagation()}
+            />
+            <button
+              onClick={(e) => { e.stopPropagation(); addTodo(); }}
+              className="px-5 py-2 bg-[#db8b44] text-white rounded-lg hover:bg-[#c57a3d] transition-colors font-bold shadow-md"
+              style={{ pointerEvents: 'auto' }}
+            >
+              Add
+            </button>
+          </div>
+        )}
 
         {/* Todo list */}
         <div className="flex-1 overflow-y-auto -mr-2 pr-2 mb-4 space-y-2">
@@ -304,8 +324,8 @@ export function TodoList({ isOpen, onClose }: TodoListProps) {
             <div className="text-center text-[#4A2C2A] opacity-60 pt-10">
               <p className="text-lg">✨</p>
               <p className="font-medium mt-2">
-                {filter === 'all' ? 'Your list is clear!' : 
-                 filter === 'active' ? 'No active tasks' : 'No completed tasks'}
+                {activeTab === 'done' ? 'No completed tasks yet!' : 
+                 `No ${activeTab} tasks yet!`}
               </p>
             </div>
           ) : (
@@ -336,33 +356,46 @@ export function TodoList({ isOpen, onClose }: TodoListProps) {
                     {todo.text}
                   </span>
                   
-                  {/* Priority indicators */}
-                  <div className="flex gap-1.5" onClick={e => e.stopPropagation()}>
-                    <button
-                      onClick={() => setPriority(todo.id, 'high')}
-                      className={`w-4 h-4 rounded-full transition-transform hover:scale-125 border-2 ${
-                        todo.priority === 'high' ? 'bg-red-500 border-red-700' : 'bg-transparent border-red-500/50'
-                      }`}
-                      style={{ pointerEvents: 'auto' }}
-                      title="High priority"
-                    />
-                    <button
-                      onClick={() => setPriority(todo.id, 'medium')}
-                      className={`w-4 h-4 rounded-full transition-transform hover:scale-125 border-2 ${
-                        todo.priority === 'medium' ? 'bg-yellow-500 border-yellow-700' : 'bg-transparent border-yellow-500/50'
-                      }`}
-                      style={{ pointerEvents: 'auto' }}
-                      title="Medium priority"
-                    />
-                     <button
-                      onClick={() => setPriority(todo.id, 'low')}
-                      className={`w-4 h-4 rounded-full transition-transform hover:scale-125 border-2 ${
-                        todo.priority === 'low' ? 'bg-green-500 border-green-700' : 'bg-transparent border-green-500/50'
-                      }`}
-                      style={{ pointerEvents: 'auto' }}
-                      title="Low priority"
-                    />
-                  </div>
+                  {/* Category indicator for done tab */}
+                  {activeTab === 'done' && (
+                    <span className={`text-xs px-2 py-1 rounded-full ${
+                      todo.category === 'study' 
+                        ? 'bg-blue-100 text-blue-800' 
+                        : 'bg-green-100 text-green-800'
+                    }`}>
+                      {todo.category}
+                    </span>
+                  )}
+                  
+                  {/* Priority indicators - only show for active tasks */}
+                  {!todo.completed && (
+                    <div className="flex gap-1.5" onClick={e => e.stopPropagation()}>
+                      <button
+                        onClick={() => setPriority(todo.id, 'high')}
+                        className={`w-4 h-4 rounded-full transition-transform hover:scale-125 border-2 ${
+                          todo.priority === 'high' ? 'bg-red-500 border-red-700' : 'bg-transparent border-red-500/50'
+                        }`}
+                        style={{ pointerEvents: 'auto' }}
+                        title="High priority"
+                      />
+                      <button
+                        onClick={() => setPriority(todo.id, 'medium')}
+                        className={`w-4 h-4 rounded-full transition-transform hover:scale-125 border-2 ${
+                          todo.priority === 'medium' ? 'bg-yellow-500 border-yellow-700' : 'bg-transparent border-yellow-500/50'
+                        }`}
+                        style={{ pointerEvents: 'auto' }}
+                        title="Medium priority"
+                      />
+                       <button
+                        onClick={() => setPriority(todo.id, 'low')}
+                        className={`w-4 h-4 rounded-full transition-transform hover:scale-125 border-2 ${
+                          todo.priority === 'low' ? 'bg-green-500 border-green-700' : 'bg-transparent border-green-500/50'
+                        }`}
+                        style={{ pointerEvents: 'auto' }}
+                        title="Low priority"
+                      />
+                    </div>
+                  )}
                   
                   {/* Delete button */}
                   <button
@@ -379,15 +412,15 @@ export function TodoList({ isOpen, onClose }: TodoListProps) {
           )}
         </div>
 
-        {/* Clear completed button */}
-        {completedCount > 0 && (
+        {/* Clear completed button - only show on done tab */}
+        {activeTab === 'done' && completedCount > 0 && (
           <div className="flex justify-center">
             <button
               onClick={(e) => { e.stopPropagation(); clearCompleted(); }}
               className="px-5 py-2 bg-black/10 text-[#4A2C2A]/80 rounded-lg hover:bg-black/20 hover:text-[#4A2C2A] transition-colors text-sm font-bold"
               style={{ pointerEvents: 'auto' }}
             >
-              Clear Completed ({completedCount})
+              Clear All Completed ({completedCount})
             </button>
           </div>
         )}
