@@ -50,7 +50,8 @@ const screenOptions = [
     id: 'shire',
     name: 'Shire',
     video: shire,
-    thumbnail: shireThumb
+    thumbnail: shireThumb,
+    hidden: true // Hide from production
   },
   {
     id: 'beachfront-cafe',
@@ -605,35 +606,41 @@ export function Main() {
           <div className="absolute bottom-20 left-4 z-20">
             <div className="rounded-lg shadow-lg p-4 backdrop-blur-sm bg-white/10 border border-white/20">
               <div className="flex gap-6">
-                {screenOptions.map((screen, index) => (
-                  <div
-                    key={screen.id}
-                    className={`relative cursor-pointer transition-all duration-300 hover:scale-125 ${
-                      currentScreen === index ? 'ring-2 ring-[#db8b44] ring-opacity-80' : ''
-                    }`}
-                    onClick={() => handleScreenChange(index)}
-                    onMouseEnter={() => setPreviewScreen(index)}
-                    onMouseLeave={() => setPreviewScreen(null)}
-                  >
-                    <div className="w-20 h-12 bg-gray-300 rounded overflow-hidden shadow-lg">
-                      <img 
-                        src={screen.thumbnail} 
-                        alt={screen.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="text-xs text-white mt-1 text-center font-medium drop-shadow-lg">
-                      {screen.name}
-                    </div>
-                    {currentScreen === index && (
-                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-[#db8b44] rounded-full flex items-center justify-center shadow-lg">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill="white"/>
-                        </svg>
+                {screenOptions
+                  .filter(screen => !screen.hidden) // Filter out hidden screens
+                  .map((screen, filteredIndex) => {
+                    // Find the original index of this screen
+                    const originalIndex = screenOptions.findIndex(s => s.id === screen.id);
+                    return (
+                      <div
+                        key={screen.id}
+                        className={`relative cursor-pointer transition-all duration-300 hover:scale-125 ${
+                          currentScreen === originalIndex ? 'ring-2 ring-[#db8b44] ring-opacity-80' : ''
+                        }`}
+                        onClick={() => handleScreenChange(originalIndex)}
+                        onMouseEnter={() => setPreviewScreen(originalIndex)}
+                        onMouseLeave={() => setPreviewScreen(null)}
+                      >
+                        <div className="w-20 h-12 bg-gray-300 rounded overflow-hidden shadow-lg">
+                          <img 
+                            src={screen.thumbnail} 
+                            alt={screen.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="text-xs text-white mt-1 text-center font-medium drop-shadow-lg">
+                          {screen.name}
+                        </div>
+                        {currentScreen === originalIndex && (
+                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-[#db8b44] rounded-full flex items-center justify-center shadow-lg">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill="white"/>
+                            </svg>
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                ))}
+                    );
+                  })}
               </div>
             </div>
           </div>

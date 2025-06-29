@@ -417,15 +417,15 @@ export function ProblemBank({ isOpen, onClose }: ProblemBankProps) {
         <div className="grid grid-cols-3 gap-3 text-center mb-4">
           <div>
             <div className="font-bold text-2xl" style={{color: '#34D399', fontFamily: 'Chewy, system-ui, sans-serif'}}>{categories.easy}</div>
-            <div className="text-xs font-medium opacity-75">EASY</div>
+            <div className="text-xs font-bold opacity-75">EASY</div>
           </div>
           <div>
             <div className="font-bold text-2xl" style={{color: '#FBBF24', fontFamily: 'Chewy, system-ui, sans-serif'}}>{categories.medium}</div>
-            <div className="text-xs font-medium opacity-75">MEDIUM</div>
+            <div className="text-xs font-bold opacity-75">MEDIUM</div>
           </div>
           <div>
             <div className="font-bold text-2xl" style={{color: '#F87171', fontFamily: 'Chewy, system-ui, sans-serif'}}>{categories.hard}</div>
-            <div className="text-xs font-medium opacity-75">HARD</div>
+            <div className="text-xs font-bold opacity-75">HARD</div>
           </div>
         </div>
 
@@ -436,21 +436,21 @@ export function ProblemBank({ isOpen, onClose }: ProblemBankProps) {
             className="flex-1 py-3 bg-green-500/20 text-green-800 rounded-lg text-sm font-bold hover:bg-green-500/30 transition-colors"
             style={{ pointerEvents: 'auto' }}
           >
-            + Easy
+            +
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); handleAddProblem('medium'); }}
             className="flex-1 py-3 bg-yellow-400/20 text-yellow-800 rounded-lg text-sm font-bold hover:bg-yellow-400/30 transition-colors"
             style={{ pointerEvents: 'auto' }}
           >
-            + Medium
+            +
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); handleAddProblem('hard'); }}
             className="flex-1 py-3 bg-red-400/20 text-red-800 rounded-lg text-sm font-bold hover:bg-red-400/30 transition-colors"
             style={{ pointerEvents: 'auto' }}
           >
-            + Hard
+            +
           </button>
         </div>
 
