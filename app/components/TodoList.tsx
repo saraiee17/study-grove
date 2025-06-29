@@ -226,7 +226,7 @@ export function TodoList({ isOpen, onClose }: TodoListProps) {
       <div className="p-5 h-full flex flex-col">
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
-          <span className="text-xl font-semibold">To-Do List</span>
+          <span className="text-xl font-semibold" style={{ fontFamily: 'Chewy, system-ui, sans-serif' }}>To-Do List</span>
           <button
             onClick={(e) => { e.stopPropagation(); onClose(); }}
             className="w-8 h-8 flex items-center justify-center text-2xl text-[#4A2C2A]/70 hover:text-[#db8b44] hover:bg-black/10 rounded-full transition-colors z-20"
