@@ -23,6 +23,12 @@ import { TodoList } from "../components/TodoList";
 // Screen options with their video sources
 const screenOptions = [
   {
+    id: 'sunset-street',
+    name: 'Sunset Street',
+    video: sunsetstreetVideo,
+    thumbnail: sunsetstreet
+  },
+  {
     id: 'cozy-bookstore',
     name: 'Cozy Bookstore',
     video: main,
@@ -33,12 +39,6 @@ const screenOptions = [
     name: 'Sunset Cliff',
     video: sunsetcliffVideo,
     thumbnail: sunsetcliff
-  },
-  {
-    id: 'sunset-street',
-    name: 'Sunset Street',
-    video: sunsetstreetVideo,
-    thumbnail: sunsetstreet
   },
   {
     id: 'indoor-garden',

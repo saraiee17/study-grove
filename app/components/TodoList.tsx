@@ -6,6 +6,7 @@ interface TodoItem {
   completed: boolean;
   priority: 'low' | 'medium' | 'high';
   category: 'study' | 'life';
+  order: number;
 }
 
 interface TodoListProps {
@@ -27,6 +28,8 @@ export function TodoList({ isOpen, onClose }: TodoListProps) {
   const [todos, setTodos] = useState<TodoItem[]>([]);
   const [newTodoText, setNewTodoText] = useState('');
   const [activeTab, setActiveTab] = useState<'study' | 'life' | 'done'>('study');
+  const [draggedItem, setDraggedItem] = useState<string | null>(null);
+  const [dragOverItem, setDragOverItem] = useState<string | null>(null);
 
   // Position and size state
   const [position, setPosition] = useState({ x: 200, y: 100 });
@@ -153,11 +156,11 @@ export function TodoList({ isOpen, onClose }: TodoListProps) {
         text: newTodoText.trim(),
         completed: false,
         priority: 'medium',
-        category: activeTab === 'done' ? 'study' : activeTab // Default to study if on done tab
+        category: activeTab === 'done' ? 'study' : activeTab,
+        order: todos.length
       };
       setTodos(prev => [...prev, newTodo]);
       setNewTodoText('');
-      // Switch to the appropriate category tab after adding
       setActiveTab(activeTab === 'done' ? 'study' : activeTab);
     }
   };
@@ -182,13 +185,121 @@ export function TodoList({ isOpen, onClose }: TodoListProps) {
     setTodos(prev => prev.filter(todo => !todo.completed));
   };
 
-  const filteredTodos = todos.filter(todo => {
-    if (activeTab === 'done') {
-      return todo.completed;
-    } else {
-      return todo.category === activeTab && !todo.completed;
+  const handleDragStart = (e: React.DragEvent, todoId: string) => {
+    e.stopPropagation();
+    setDraggedItem(todoId);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', todoId);
+  };
+
+  const handleDragOver = (e: React.DragEvent, todoId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (draggedItem && draggedItem !== todoId) {
+      setDragOverItem(todoId);
     }
-  });
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOverItem(null);
+  };
+
+  const handleDrop = (e: React.DragEvent, targetTodoId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!draggedItem || draggedItem === targetTodoId) {
+      setDraggedItem(null);
+      setDragOverItem(null);
+      return;
+    }
+
+    const draggedTodo = todos.find(todo => todo.id === draggedItem);
+    const targetTodo = todos.find(todo => todo.id === targetTodoId);
+    
+    if (!draggedTodo || !targetTodo) {
+      setDraggedItem(null);
+      setDragOverItem(null);
+      return;
+    }
+
+    // Reorder todos
+    const reorderedTodos = [...todos];
+    const draggedIndex = reorderedTodos.findIndex(todo => todo.id === draggedItem);
+    const targetIndex = reorderedTodos.findIndex(todo => todo.id === targetTodoId);
+    
+    // Remove dragged item
+    const [removed] = reorderedTodos.splice(draggedIndex, 1);
+    
+    // Insert at target position
+    reorderedTodos.splice(targetIndex, 0, removed);
+    
+    // Update order numbers
+    const updatedTodos = reorderedTodos.map((todo, index) => ({
+      ...todo,
+      order: index
+    }));
+    
+    setTodos(updatedTodos);
+    setDraggedItem(null);
+    setDragOverItem(null);
+  };
+
+  const moveTodoUp = (todoId: string) => {
+    console.log('Moving up:', todoId);
+    const currentIndex = todos.findIndex(todo => todo.id === todoId);
+    console.log('Current index:', currentIndex);
+    
+    if (currentIndex > 0) {
+      const newTodos = [...todos];
+      const temp = newTodos[currentIndex];
+      newTodos[currentIndex] = newTodos[currentIndex - 1];
+      newTodos[currentIndex - 1] = temp;
+      
+      // Update order numbers
+      const updatedTodos = newTodos.map((todo, index) => ({
+        ...todo,
+        order: index
+      }));
+      
+      console.log('New order:', updatedTodos.map(t => t.text));
+      setTodos(updatedTodos);
+    }
+  };
+
+  const moveTodoDown = (todoId: string) => {
+    console.log('Moving down:', todoId);
+    const currentIndex = todos.findIndex(todo => todo.id === todoId);
+    console.log('Current index:', currentIndex);
+    
+    if (currentIndex < todos.length - 1) {
+      const newTodos = [...todos];
+      const temp = newTodos[currentIndex];
+      newTodos[currentIndex] = newTodos[currentIndex + 1];
+      newTodos[currentIndex + 1] = temp;
+      
+      // Update order numbers
+      const updatedTodos = newTodos.map((todo, index) => ({
+        ...todo,
+        order: index
+      }));
+      
+      console.log('New order:', updatedTodos.map(t => t.text));
+      setTodos(updatedTodos);
+    }
+  };
+
+  const filteredTodos = todos
+    .filter(todo => {
+      if (activeTab === 'done') {
+        return todo.completed;
+      } else {
+        return todo.category === activeTab && !todo.completed;
+      }
+    })
+    .sort((a, b) => a.order - b.order); // Sort by order
 
   const completedCount = todos.filter(todo => todo.completed).length;
   const totalCount = todos.length;
@@ -333,12 +444,36 @@ export function TodoList({ isOpen, onClose }: TodoListProps) {
               {filteredTodos.map(todo => (
                 <div
                   key={todo.id}
-                  className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-300 cursor-pointer ${
+                  draggable={!todo.completed}
+                  onDragStart={(e) => handleDragStart(e, todo.id)}
+                  onDragOver={(e) => handleDragOver(e, todo.id)}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) => handleDrop(e, todo.id)}
+                  onMouseDown={(e) => {
+                    // Only prevent panel drag if we're on a draggable item
+                    if (!todo.completed) {
+                      e.stopPropagation();
+                    }
+                  }}
+                  className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-300 ${
                     todo.completed 
-                      ? 'bg-black/5 text-[#4A2C2A]/50' 
-                      : 'bg-white/40 hover:bg-white/60'
+                      ? 'bg-black/5 text-[#4A2C2A]/50 cursor-default' 
+                      : 'bg-white/40 hover:bg-white/60 cursor-grab active:cursor-grabbing'
+                  } ${
+                    draggedItem === todo.id ? 'opacity-50 scale-95 shadow-lg' : ''
+                  } ${
+                    dragOverItem === todo.id ? 'border-2 border-[#db8b44] border-dashed bg-white/60' : ''
                   }`}
                 >
+                  {/* Drag handle - only show for active tasks */}
+                  {!todo.completed && (
+                    <div className="w-4 h-4 flex items-center justify-center text-[#4A2C2A]/30 hover:text-[#4A2C2A]/60">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 6h8v2H8zm0 5h8v2H8zm0 5h8v2H8z"/>
+                      </svg>
+                    </div>
+                  )}
+                  
                   <div className="flex items-center">
                     <input
                       type="checkbox"
